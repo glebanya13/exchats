@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:exchats/locator.dart';
-import 'package:exchats/presentation/store/user_store.dart';
+import '../../../../core/di/locator.dart';
+import '../../../../features/user/presentation/store/user_store.dart';
 
 class MyProfileScreen extends StatelessWidget {
   const MyProfileScreen({Key? key}) : super(key: key);
@@ -123,7 +123,7 @@ class MyProfileScreen extends StatelessWidget {
     FontWeight valueFontWeight = FontWeight.normal,
   }) {
     return Container(
-      height: 75.0,
+      constraints: const BoxConstraints(minHeight: 75.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -142,6 +142,7 @@ class MyProfileScreen extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   label,

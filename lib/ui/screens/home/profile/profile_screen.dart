@@ -8,8 +8,8 @@ import 'package:exchats/ui/screens/home/profile/folders_screen.dart';
 import 'package:exchats/ui/screens/home/profile/my_profile_screen.dart';
 import 'package:exchats/ui/screens/home/profile/notifications_screen.dart';
 import 'package:exchats/ui/screens/home/profile/privacy_screen.dart';
-import 'package:exchats/locator.dart';
-import 'package:exchats/presentation/store/user_store.dart';
+import '../../../../core/di/locator.dart';
+import '../../../../features/user/presentation/store/user_store.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);

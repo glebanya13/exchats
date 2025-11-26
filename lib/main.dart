@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'locator.dart';
-import 'presentation/router/app_router.dart';
-import 'presentation/store/auth_store.dart';
+import '../../../../core/di/locator.dart';
+import 'core/router/app_router.dart';
+import 'features/auth/presentation/store/auth_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

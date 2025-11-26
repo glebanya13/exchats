@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:exchats/locator.dart';
+import '../../../../core/di/locator.dart';
 import 'package:exchats/ui/shared_widgets/safe_svg_icon.dart';
-import 'package:exchats/presentation/store/user_store.dart';
-import 'package:exchats/presentation/store/auth_store.dart';
+import '../../../features/user/presentation/store/user_store.dart';
+import '../../../features/auth/presentation/store/auth_store.dart';
 
-import 'calls/calls_screen.dart';
-import 'chats/chats_screen.dart';
+import '../../../features/call/presentation/ui/calls/calls_screen.dart';
+import '../../../features/chat/presentation/ui/chats/chats_screen.dart';
 import 'contacts/contacts_screen.dart';
 import 'profile/profile_screen.dart';
 
@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               });
             },
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: theme.colorScheme.secondary,
+            selectedItemColor: const Color(0xFF1677FF),
             unselectedItemColor: theme.textTheme.bodyLarge?.color,
             items: [
               BottomNavigationBarItem(
@@ -83,13 +83,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       width: 24.0,
                       height: 24.0,
                       color: _currentIndex == 0
-                          ? theme.colorScheme.secondary
+                          ? const Color(0xFF1677FF)
                           : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                       fallback: Icon(
                         _currentIndex == 0 ? Icons.chat_bubble : Icons.chat_bubble_outline,
                         size: 24.0,
                         color: _currentIndex == 0
-                            ? theme.colorScheme.secondary
+                            ? const Color(0xFF1677FF)
                             : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                       ),
                     ),
@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.secondary,
+                          color: const Color(0xFF1677FF),
                           shape: BoxShape.circle,
                         ),
                     constraints: const BoxConstraints(
@@ -131,13 +131,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       width: 24.0,
                       height: 24.0,
                       color: _currentIndex == 1
-                          ? theme.colorScheme.secondary
+                          ? const Color(0xFF1677FF)
                           : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                       fallback: Icon(
                         _currentIndex == 1 ? Icons.phone : Icons.phone_outlined,
                         size: 24.0,
                         color: _currentIndex == 1
-                            ? theme.colorScheme.secondary
+                            ? const Color(0xFF1677FF)
                             : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                       ),
                     ),
@@ -147,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.secondary,
+                          color: const Color(0xFF1677FF),
                           shape: BoxShape.circle,
                         ),
                     constraints: const BoxConstraints(
@@ -176,13 +176,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   width: 24.0,
                   height: 24.0,
                   color: _currentIndex == 2
-                      ? theme.colorScheme.secondary
+                      ? const Color(0xFF1677FF)
                       : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                   fallback: Icon(
                     Icons.people_outline,
                     size: 24.0,
                     color: _currentIndex == 2
-                        ? theme.colorScheme.secondary
+                        ? const Color(0xFF1677FF)
                         : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                   ),
                 ),
@@ -194,13 +194,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   width: 24.0,
                   height: 24.0,
                   color: _currentIndex == 3
-                      ? theme.colorScheme.secondary
+                      ? const Color(0xFF1677FF)
                       : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                   fallback: Icon(
                     Icons.person_outline,
                     size: 24.0,
                     color: _currentIndex == 3
-                        ? theme.colorScheme.secondary
+                        ? const Color(0xFF1677FF)
                         : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                   ),
                 ),
