@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:exchats/models/message.dart';
-import 'package:exchats/models/user_details.dart';
+import 'package:exchats/domain/entity/message_entity.dart';
+import 'package:exchats/domain/entity/user_entity.dart';
 import 'package:exchats/ui/icons/app_icons.dart';
 
 class MessageInput extends StatefulWidget {
-  final Message? replyToMessage;
-  final UserDetails? replyToUser;
+  final MessageEntity? replyToMessage;
+  final UserEntity? replyToUser;
   final VoidCallback? onReplyCancel;
 
   const MessageInput({
@@ -93,7 +93,7 @@ class _MessageInputState extends State<MessageInput>
         child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Input row
+
           Container(
             constraints: BoxConstraints(
               minHeight: widget.replyToMessage != null ? 60.0 : 50.0,
@@ -106,7 +106,7 @@ class _MessageInputState extends State<MessageInput>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Reply preview
+
                 if (widget.replyToMessage != null)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(48.0, 8.0, 48.0, 8.0),
@@ -163,7 +163,7 @@ class _MessageInputState extends State<MessageInput>
                       ),
                     ),
                   ),
-                // Input field row
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -238,7 +238,7 @@ class _MessageInputState extends State<MessageInput>
           ),
           Builder(builder: (_) {
             if (_showSendMessageButton)
-              return _SendMessageButton(controller: _controller);
+              return _SendMessageEntityButton(controller: _controller);
 
             return Container(
               margin: const EdgeInsets.only(right: 8.0),
@@ -268,10 +268,10 @@ class _MessageInputState extends State<MessageInput>
   }
 }
 
-class _SendMessageButton extends AnimatedWidget {
+class _SendMessageEntityButton extends AnimatedWidget {
   final AnimationController controller;
 
-  _SendMessageButton({
+  _SendMessageEntityButton({
     Key? key,
     required this.controller,
   })   : _scale = Tween<double>(
@@ -294,13 +294,13 @@ class _SendMessageButton extends AnimatedWidget {
       children: <Widget>[
         Transform.scale(
           scale: _scale.value,
-          child: _buildSendMessageButton(context),
+          child: _buildSendMessageEntityButton(context),
         ),
       ],
     );
   }
 
-  Widget _buildSendMessageButton(BuildContext context) {
+  Widget _buildSendMessageEntityButton(BuildContext context) {
     return IconButton(
       onPressed: () {},
       icon: Icon(

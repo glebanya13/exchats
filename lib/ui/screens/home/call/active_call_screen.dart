@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
 import 'widgets/connection_request_dialog.dart';
 
@@ -50,7 +51,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
   @override
   void initState() {
     super.initState();
-    // Simulate call connection
+
     Future.delayed(Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
@@ -58,7 +59,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
         });
       }
     });
-    // Simulate connection request after 5 seconds
+
     Future.delayed(Duration(seconds: 5), () {
       if (mounted) {
         ConnectionRequestDialog.show(
@@ -88,11 +89,11 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
       backgroundColor: Colors.grey[200],
       body: Stack(
         children: [
-          // Video background or avatar
+
           _buildVideoBackground(userName, theme),
-          // Participants list (if shown)
+
           if (_showParticipants) _buildParticipantsList(theme),
-          // Bottom controls
+
           _buildBottomControls(theme),
         ],
       ),
@@ -101,7 +102,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
 
   Widget _buildVideoBackground(String userName, ThemeData theme) {
     if (widget.isVideoCall && _isVideoEnabled) {
-      // Simulated video feed - in real app this would be actual video
+
       return Container(
         width: double.infinity,
         height: double.infinity,
@@ -143,7 +144,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
         ),
       );
     } else {
-      // Static background with avatar
+
       return Container(
         width: double.infinity,
         height: double.infinity,
@@ -268,7 +269,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
           itemCount: participants.length + 1,
           itemBuilder: (context, index) {
             if (index == 0) {
-              // "Добавить пользователя" как первый item
+
               return Container(
                 margin: const EdgeInsets.only(bottom: 8.0),
                 decoration: BoxDecoration(
@@ -286,7 +287,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
-                      // TODO: Add user functionality
+
                     },
                     borderRadius: BorderRadius.circular(8.0),
                     child: Padding(
@@ -335,7 +336,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    // TODO: Participant tap functionality
+
                   },
                   borderRadius: BorderRadius.circular(8.0),
                   child: Padding(
@@ -455,9 +456,9 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
                 icon: Icons.call_end,
                 backgroundColor: Colors.red,
                 iconColor: Colors.white,
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
+                  onTap: () {
+                    context.pop();
+                  },
               ),
             ],
           ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:exchats/models/user_details.dart';
+import 'package:exchats/domain/entity/user_entity.dart';
 
 class TypingIndicator extends StatefulWidget {
-  final UserDetails? typingUser;
+  final UserEntity? typingUser;
   final bool showAvatar;
 
   const TypingIndicator({
@@ -89,7 +89,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
               ),
             )
           else
-            const SizedBox(width: 8.0), // Отступ как у сообщений без аватара
+            const SizedBox(width: 8.0), 
           Container(
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.75,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:exchats/ui/shared_widgets/safe_svg_icon.dart';
 import 'package:exchats/ui/screens/home/profile/business_account_screen.dart';
 import 'package:exchats/ui/screens/home/profile/devices_screen.dart';
@@ -8,7 +8,8 @@ import 'package:exchats/ui/screens/home/profile/folders_screen.dart';
 import 'package:exchats/ui/screens/home/profile/my_profile_screen.dart';
 import 'package:exchats/ui/screens/home/profile/notifications_screen.dart';
 import 'package:exchats/ui/screens/home/profile/privacy_screen.dart';
-import 'package:exchats/view_models/home/home_viewmodel.dart';
+import 'package:exchats/locator.dart';
+import 'package:exchats/presentation/store/user_store.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -16,12 +17,12 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userDetails = context.watch<HomeViewModel>().userDetails;
-    final formattedPhoneNumber = context.watch<HomeViewModel>().formattedPhoneNumber;
-    final userName = userDetails != null
-        ? '${userDetails.firstName} ${userDetails.lastName}'.trim()
+    final userStore = locator<UserStore>();
+    final user = userStore.user;
+    final userName = user != null
+        ? '${user.firstName} ${user.lastName}'.trim()
         : 'Артём';
-    final phoneNumber = formattedPhoneNumber ?? userDetails?.phoneNumber ?? '+7 922 222 23 12';
+    final phoneNumber = userStore.formattedPhoneNumber ?? user?.phoneNumber ?? '+7 922 222 23 12';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -104,15 +105,7 @@ class ProfileScreen extends StatelessWidget {
                 iconColor: theme.colorScheme.secondary,
                 title: 'Мой профиль',
                 onTap: () {
-                  final homeViewModel = Provider.of<HomeViewModel>(context, listen: false);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => ChangeNotifierProvider.value(
-                        value: homeViewModel,
-                        child: const MyProfileScreen(),
-                      ),
-                    ),
-                  );
+                  context.push('/my_profile');
                 },
               ),
               const SizedBox(height: 5.0),
@@ -122,9 +115,7 @@ class ProfileScreen extends StatelessWidget {
                 iconColor: Colors.red,
                 title: 'Уведомления',
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const NotificationsScreen()),
-                  );
+                  context.push('/notifications');
                 },
               ),
               const SizedBox(height: 5.0),
@@ -134,9 +125,7 @@ class ProfileScreen extends StatelessWidget {
                 iconColor: theme.colorScheme.secondary,
                 title: 'Папки',
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const FoldersScreen()),
-                  );
+                  context.push('/folders');
                 },
               ),
               const SizedBox(height: 5.0),
@@ -146,9 +135,7 @@ class ProfileScreen extends StatelessWidget {
                 iconColor: Colors.orange,
                 title: 'Устройства',
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const DevicesScreen()),
-                  );
+                  context.push('/devices');
                 },
               ),
               const SizedBox(height: 5.0),
@@ -158,9 +145,7 @@ class ProfileScreen extends StatelessWidget {
                 iconColor: Colors.grey[600]!,
                 title: 'Конфиденциальность',
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const PrivacyScreen()),
-                  );
+                  context.push('/privacy');
                 },
               ),
               const SizedBox(height: 24.0),
@@ -170,9 +155,7 @@ class ProfileScreen extends StatelessWidget {
                 iconColor: Colors.green,
                 title: 'Создать бизнес аккаунт',
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const BusinessAccountScreen()),
-                  );
+                  context.push('/business_account');
                 },
               ),
               const SizedBox(height: 32.0),

@@ -238,19 +238,19 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
         if (_controllers.every((c) => c.text.isNotEmpty)) {
           final enteredPassword = _controllers.map((c) => c.text).join();
           if (enteredPassword == widget.password) {
-            // Password confirmed, save it
+
             final prefs = await SharedPreferences.getInstance();
             await prefs.setString('app_password', widget.password);
             Navigator.of(context).popUntil((route) => route.isFirst);
           } else {
-            // Show error
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Пароли не совпадают'),
                 backgroundColor: Colors.red,
               ),
             );
-            // Clear fields
+
             for (var controller in _controllers) {
               controller.clear();
             }
@@ -327,19 +327,19 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
                       ? () async {
                           final enteredPassword = _controllers.map((c) => c.text).join();
                           if (enteredPassword == widget.password) {
-                            // Password confirmed, save it
+
                             final prefs = await SharedPreferences.getInstance();
                             await prefs.setString('app_password', widget.password);
                             Navigator.of(context).popUntil((route) => route.isFirst);
                           } else {
-                            // Show error
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Пароли не совпадают'),
                                 backgroundColor: Colors.red,
                               ),
                             );
-                            // Clear fields
+
                             for (var controller in _controllers) {
                               controller.clear();
                             }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:exchats/ui/router.dart';
-import 'package:exchats/ui/screens/auth/router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:exchats/locator.dart';
+import 'package:exchats/presentation/store/auth_store.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String phoneNumber;
@@ -25,7 +26,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   void initState() {
     super.initState();
-    // Set test code 111111
+
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       for (int i = 0; i < 6; i++) {
         _controllers[i].text = '1';
@@ -73,7 +74,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo
+
                   Image.asset(
                     'assets/auth/logo.png',
                     width: 64.0,
@@ -91,7 +92,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     },
                   ),
                   const SizedBox(height: 24.0),
-                  // Title
+
                   Text(
                     'Код верификации',
                     style: TextStyle(
@@ -101,7 +102,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ),
                   ),
                   const SizedBox(height: 8.0),
-                  // White card starts here - no padding, just color separation
+
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -111,7 +112,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Instruction or error - starts the white card
+
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
                           child: Text(
@@ -130,10 +131,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             children: [
-                              // Code input fields
+
                               _buildCodeInputs(theme),
                               const SizedBox(height: 32.0),
-                              // Login button
+
                               _buildLoginButton(theme),
                             ],
                           ),
@@ -142,7 +143,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ),
                   ),
                   const SizedBox(height: 24.0),
-                  // Terms link - outside white card
+
                   _buildTermsLink(theme),
                 ],
               ),
@@ -229,24 +230,32 @@ class _VerificationScreenState extends State<VerificationScreen> {
     );
   }
 
-  void _checkCode() {
+  Future<void> _checkCode() async {
     final code = _controllers.map((c) => c.text).join();
     setState(() {
       _isCodeComplete = code.length == 6;
+    });
+    
       if (_isCodeComplete) {
-        // Simulate code verification
-        if (code == '111111' || code == '123456') {
-          _errorMessage = null;
-          // Navigate to home or profile creation
-          Navigator.of(context, rootNavigator: true)
-              .pushReplacementNamed(AppRoutes.Home);
-        } else {
+      try {
+        final authStore = locator<AuthStore>();
+        await authStore.verifyCode(
+          phoneNumber: widget.phoneNumber,
+          code: code,
+        );
+        if (mounted) {
+          context.go('/');
+        }
+      } catch (e) {
+        setState(() {
           _errorMessage = 'Не верно указанный код';
+        });
         }
       } else {
+      setState(() {
         _errorMessage = null;
+      });
       }
-    });
   }
 
   Widget _buildLoginButton(ThemeData theme) {
@@ -254,16 +263,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _isCodeComplete && _errorMessage == null
-            ? () {
-                final code = _controllers.map((c) => c.text).join();
-                if (code == '111111' || code == '123456') {
-                  Navigator.of(context, rootNavigator: true)
-                      .pushReplacementNamed(AppRoutes.Home);
-                } else {
-                  setState(() {
-                    _errorMessage = 'Не верно указанный код';
-                  });
-                }
+            ? () async {
+                await _checkCode();
               }
             : null,
         style: ElevatedButton.styleFrom(
@@ -293,7 +294,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   Widget _buildTermsLink(ThemeData theme) {
     return GestureDetector(
       onTap: () {
-        // TODO: Show terms
+
       },
       child: Text(
         'Условия публичной оферты',

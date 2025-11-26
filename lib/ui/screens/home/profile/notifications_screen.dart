@@ -32,7 +32,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16.0),
-            // Message Notifications Section
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -64,7 +64,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ),
             const SizedBox(height: 32.0),
-            // In-app Notifications Section
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(

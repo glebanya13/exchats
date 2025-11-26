@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
 import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
@@ -35,19 +36,13 @@ class _CallScreenState extends State<CallScreen> {
     final theme = Theme.of(context);
     final userName = widget.userName ?? 'Unknown';
 
-    // If call is connected, show active call screen
+
     if (!widget.isIncoming) {
-      // Simulate call connection after a delay
+
       Future.delayed(Duration(seconds: 1), () {
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => ActiveCallScreen(
-                userId: widget.userId,
-                userName: userName,
-                isVideoCall: widget.isVideoCall,
-              ),
-            ),
+          context.go(
+            '/active_call?userId=${widget.userId}&userName=${Uri.encodeComponent(userName)}&isVideoCall=${widget.isVideoCall}',
           );
         }
       });
@@ -61,7 +56,7 @@ class _CallScreenState extends State<CallScreen> {
         leading: AppBarIconButton(
           icon: Icons.arrow_downward,
           iconColor: Colors.white,
-          onTap: () => Navigator.of(context).pop(),
+          onTap: () => context.pop(),
         ),
         actions: [
           AppBarIconButton(
@@ -121,14 +116,8 @@ class _CallScreenState extends State<CallScreen> {
                       const SizedBox(height: 24.0),
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (_) => ActiveCallScreen(
-                                userId: widget.userId,
-                                userName: userName,
-                                isVideoCall: widget.isVideoCall,
-                              ),
-                            ),
+                          context.go(
+                            '/active_call?userId=${widget.userId}&userName=${Uri.encodeComponent(userName)}&isVideoCall=${widget.isVideoCall}',
                           );
                         },
                         child: Container(
@@ -162,7 +151,7 @@ class _CallScreenState extends State<CallScreen> {
                 ),
               ),
             ),
-            // Call Controls
+
             Padding(
               padding: const EdgeInsets.all(32.0),
               child: Row(

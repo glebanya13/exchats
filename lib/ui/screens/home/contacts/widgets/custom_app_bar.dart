@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
-import 'package:exchats/view_models/home/contacts/contacts_viewmodel.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomAppBar({Key? key}) : super(key: key);
@@ -41,7 +40,7 @@ class _CustomAppBarState extends State<CustomAppBar>
             setState(() {
               _isSearching = false;
               _searchController.clear();
-              context.read<ContactsViewModel>().updateSearchQuery('');
+
             });
           } else {
             Navigator.of(context).pop();
@@ -88,7 +87,7 @@ class _CustomAppBarState extends State<CustomAppBar>
         border: InputBorder.none,
       ),
       onChanged: (value) {
-        context.read<ContactsViewModel>().updateSearchQuery(value);
+
       },
     );
   }

@@ -52,7 +52,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16.0),
-            // Security Section
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -108,7 +108,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
               ),
             ),
             const SizedBox(height: 32.0),
-            // Privacy Section
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(

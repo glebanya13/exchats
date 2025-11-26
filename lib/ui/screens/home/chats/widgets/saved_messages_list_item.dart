@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:exchats/models/message.dart';
 import 'package:exchats/ui/icons/app_icons.dart';
 import 'package:exchats/ui/screens/home/chat/saved_messages/saved_messages_screen.dart';
 import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
-import 'package:exchats/ui/theming/theme_manager.dart';
-import 'package:exchats/util/slide_left_with_fade_route.dart';
-import 'package:exchats/view_models/home/chats/saved_messages_list_item_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/saved_messages_viewmodel.dart';
 
 class SavedMessagesListItem extends StatefulWidget {
   SavedMessagesListItem({Key? key}) : super(key: key);
@@ -24,7 +19,7 @@ class _SavedMessagesListItemState extends State<SavedMessagesListItem> {
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
-          SlideWithFadeRoute(
+          MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider.value(
               value: context.read<SavedMessagesViewModel>(),
               child: SavedMessagesScreen(),
@@ -70,7 +65,7 @@ class _SavedMessagesListItemState extends State<SavedMessagesListItem> {
   }
 
   Widget _buildLeading() {
-    final theme = ThemeManager.of(context).currentTheme;
+    final theme = Theme.of(context);
 
     return Stack(
       children: <Widget>[
@@ -81,7 +76,7 @@ class _SavedMessagesListItemState extends State<SavedMessagesListItem> {
               aspectRatio: 1.0,
               child: RoundedAvatar(
                 icon: AppIcons.saved_messages,
-                backgroundColor: theme.data.colorScheme.secondary,
+                backgroundColor: theme.colorScheme.secondary,
               ),
             );
           },

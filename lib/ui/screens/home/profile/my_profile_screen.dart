@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
-import 'package:exchats/view_models/home/home_viewmodel.dart';
+import 'package:go_router/go_router.dart';
+import 'package:exchats/locator.dart';
+import 'package:exchats/presentation/store/user_store.dart';
 
 class MyProfileScreen extends StatelessWidget {
   const MyProfileScreen({Key? key}) : super(key: key);
@@ -9,12 +10,12 @@ class MyProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userDetails = context.watch<HomeViewModel>().userDetails;
-    final formattedPhoneNumber = context.watch<HomeViewModel>().formattedPhoneNumber;
-    final userName = userDetails != null
-        ? '${userDetails.firstName} ${userDetails.lastName}'.trim()
+    final userStore = locator<UserStore>();
+    final user = userStore.user;
+    final userName = user != null
+        ? '${user.firstName} ${user.lastName}'.trim()
         : 'Артём';
-    final phoneNumber = formattedPhoneNumber ?? userDetails?.phoneNumber ?? '+7 (909) 844-12-23';
+    final phoneNumber = userStore.formattedPhoneNumber ?? user?.phoneNumber ?? '+7 (909) 844-12-23';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -22,8 +23,8 @@ class MyProfileScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => context.pop(),
         ),
         actions: [
           IconButton(
@@ -36,7 +37,7 @@ class MyProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 16.0),
-            // Avatar
+
             Container(
               width: 78.0,
               height: 78.0,
@@ -57,7 +58,7 @@ class MyProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16.0),
-            // Name
+
             Text(
               userName,
               style: TextStyle(
@@ -67,7 +68,7 @@ class MyProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8.0),
-            // Online status
+
             Text(
               'В сети',
               style: TextStyle(
@@ -76,7 +77,7 @@ class MyProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32.0),
-            // Profile details cards
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(

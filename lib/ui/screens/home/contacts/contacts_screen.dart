@@ -81,15 +81,15 @@ class _ContactsScreenState extends State<ContactsScreen> {
     final minute = lastSeen.minute.toString().padLeft(2, '0');
     final time = '$hour:$minute';
 
-    // Если сегодня
+
     if (difference.inDays == 0) {
       return 'Был(а) в $time';
     }
-    // Если вчера
+
     else if (difference.inDays == 1) {
       return 'Был(а) вчера в $time';
     }
-    // Если в этом году
+
     else if (lastSeen.year == now.year) {
       final months = [
         'января',
@@ -107,7 +107,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
       ];
       return 'Был(а) ${lastSeen.day} ${months[lastSeen.month - 1]} в $time';
     }
-    // Если в прошлом году
+
     else {
       final months = [
         'января',
@@ -134,7 +134,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar
+
             Container(
               margin: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -162,7 +162,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 ),
               ),
             ),
-            // Sort Header
+
             Container(
               padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 12.0),
               alignment: Alignment.centerLeft,
@@ -175,7 +175,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 ),
               ),
             ),
-            // Contacts List
+
             Expanded(
               child: ListView.builder(
                 itemCount: _filteredContacts.length,
@@ -206,7 +206,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                           padding: const EdgeInsets.all(16.0),
                           child: Row(
                             children: [
-                              // Avatar
+
                               Container(
                                 width: 48.0,
                                 height: 48.0,
@@ -227,7 +227,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                 ),
                               ),
                               const SizedBox(width: 16.0),
-                              // Name and Status
+
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

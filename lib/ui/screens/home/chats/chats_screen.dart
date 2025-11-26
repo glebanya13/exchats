@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
-import 'package:exchats/view_models/home/chats/chat_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/chats_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/dialog_list_item_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/dialog_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/group_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/saved_messages_list_item_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/saved_messages_viewmodel.dart';
-
-import '../router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:exchats/locator.dart';
+import 'package:exchats/presentation/store/chat_store.dart';
+import 'package:exchats/presentation/store/auth_store.dart';
+import 'package:exchats/domain/entity/chat_entity.dart';
+import 'package:mobx/mobx.dart';
 import '../new_chat/new_chat_screen.dart';
 import 'strings.dart';
 import 'widgets/chat_loading_list_item.dart';
-import 'widgets/dialog_list_item.dart';
-import 'widgets/saved_messages_list_item.dart';
-import 'widgets/swipeable_chat_item.dart';
+import 'widgets/chat_list_item.dart';
 import 'archive_screen.dart';
 
 class ChatsScreen extends StatefulWidget {
+  const ChatsScreen({Key? key}) : super(key: key);
+
   @override
   _ChatsScreenState createState() => _ChatsScreenState();
 }
@@ -28,13 +25,21 @@ class _ChatsScreenState extends State<ChatsScreen> {
   int _selectedTabIndex = 0;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  bool _isArchiveVisible = true;
+  late final ChatStore _chatStore;
+  late final AuthStore _authStore;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      context.read<ChatsViewModel>().loadChats();
+    _chatStore = locator<ChatStore>();
+    _authStore = locator<AuthStore>();
+    
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      final userId = _authStore.currentUserId ?? 'user1';
+      print('ChatsScreen: Loading chats for userId: $userId');
+      _chatStore.loadChats(userId);
     });
   }
 
@@ -46,15 +51,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
   }
 
   void _toggleArchive() {
-    final chatsViewModel = context.read<ChatsViewModel>();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider<ChatsViewModel>.value(
-          value: chatsViewModel,
-          child: const ArchiveScreen(),
-        ),
-      ),
-    );
+    context.push('/archive');
   }
 
   @override
@@ -62,107 +59,98 @@ class _ChatsScreenState extends State<ChatsScreen> {
     final theme = Theme.of(context);
     
     return Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
-        body: Container(
-          color: const Color(0xFFF8F9FA),
-          child: SafeArea(
-            bottom: false,
-            child: LayoutBuilder(
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: Container(
+        color: const Color(0xFFF8F9FA),
+        child: SafeArea(
+          bottom: false,
+          child: LayoutBuilder(
             builder: (context, constraints) {
-              final searchBarHeight = 56.0;
-              final tabsHeight = 48.0;
-              final dividerHeight = 1.0;
-              final topAreaHeight = searchBarHeight + tabsHeight + dividerHeight;
-              
               return Stack(
                 children: [
                   Column(
                     children: [
                       Container(
-                        color: Color(0xFFF8F9FA),
+                        color: const Color(0xFFF8F9FA),
                         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
                         child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 40.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child: TextField(
-                                    controller: _searchController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Поиск',
-                                      hintStyle: TextStyle(
-                                        color: theme.textTheme.bodyLarge?.color?.withOpacity(0.5),
-                                        fontSize: 16.0,
-                                      ),
-                                      prefixIcon: Icon(
-                                        Icons.search,
-                                        color: theme.textTheme.bodyLarge?.color?.withOpacity(0.5),
-                                        size: 20.0,
-                                      ),
-                                      border: InputBorder.none,
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                                    ),
-                                    style: TextStyle(
-                                      color: theme.textTheme.displayLarge!.color,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 40.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: TextField(
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                    hintText: 'Поиск',
+                                    hintStyle: TextStyle(
+                                      color: theme.textTheme.bodyLarge?.color?.withOpacity(0.5),
                                       fontSize: 16.0,
                                     ),
+                                    prefixIcon: Icon(
+                                      Icons.search,
+                                      color: theme.textTheme.bodyLarge?.color?.withOpacity(0.5),
+                                      size: 20.0,
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                                  ),
+                                  style: TextStyle(
+                                    color: theme.textTheme.displayLarge!.color,
+                                    fontSize: 16.0,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8.0),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => const NewChatScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
+                            ),
+                            const SizedBox(width: 8.0),
+                            GestureDetector(
+                              onTap: () {
+                                context.push('/new_chat');
+                              },
+                              child: Container(
+                                width: 40.0,
+                                height: 40.0,
+                                child: SvgPicture.asset(
+                                  'assets/bottom/chat-button.svg',
                                   width: 40.0,
                                   height: 40.0,
-                                  child: SvgPicture.asset(
-                                    'assets/bottom/chat-button.svg',
-                                    width: 40.0,
-                                    height: 40.0,
-                                  ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
+                      ),
                       Container(
-                          color: Color(0xFFF8F9FA),
-                          height: 48.0,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                            children: [
-                              _buildCategoryTab('Все', 23, 0),
-                              _buildCategoryTab('Личные', 19, 1),
-                              _buildCategoryTab('Сохраненные', 0, 2),
-                              _buildCategoryTab('Системные', 0, 3),
-                            ],
-                          ),
+                        color: const Color(0xFFF8F9FA),
+                        height: 48.0,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          children: [
+                            Observer(
+                              builder: (_) {
+                                final allCount = _chatStore.chats.length;
+                                final dialogCount = _chatStore.chats.where((c) => c.type == 'dialog').length;
+                                final savedCount = _chatStore.chats.where((c) => c.type == 'saved_messages').length;
+                                return Row(
+                                  children: [
+                                    _buildCategoryTab('Все', allCount, 0),
+                                    _buildCategoryTab('Личные', dialogCount, 1),
+                                    _buildCategoryTab('Сохраненные', savedCount, 2),
+                                    _buildCategoryTab('Системные', 0, 3),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                        const Divider(height: 1.0),
+                      ),
+                      const Divider(height: 1.0),
                       Expanded(
-                        child: Selector<ChatsViewModel, bool>(
-          selector: (context, model) => model.chatsLoaded,
-          builder: (context, chatsLoaded, child) {
-            return AnimatedSwitcher(
-              duration: Duration(milliseconds: 350),
-              reverseDuration: Duration(milliseconds: 350),
-              switchInCurve: Curves.easeInOutCubic,
-              switchOutCurve: Curves.easeInOutCubic,
-              child: chatsLoaded ? _buildChatList() : _buildChatListLoader(),
-            );
-          },
-        ),
+                        child: _buildChatList(),
                       ),
                     ],
                   ),
@@ -237,96 +225,52 @@ class _ChatsScreenState extends State<ChatsScreen> {
   }
 
   Widget _buildChatList() {
-    return Builder(
-      builder: (context) {
-    return Consumer<ChatsViewModel>(
-      builder: (context, model, child) {
-            final filteredChats = _getFilteredChats(model.chats);
-            
-            return ListView.builder(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.zero,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return _buildArchiveItem();
-                }
-                final chatIndex = index - 1;
-            if (chatIndex < 0 || chatIndex >= filteredChats.length) {
-              return const SizedBox.shrink();
-            }
-            final chatViewModel = filteredChats[chatIndex];
+    return Observer(
+      builder: (_) {
 
-            if (chatViewModel is SavedMessagesViewModel) {
-              return MultiProvider(
-                providers: [
-                  ChangeNotifierProvider<SavedMessagesViewModel>.value(
-                    value: chatViewModel,
-                  ),
-                  ChangeNotifierProxyProvider<SavedMessagesViewModel,
-                      SavedMessagesListItemViewModel>(
-                    create: (_) => SavedMessagesListItemViewModel(),
-                    update: (_, viewModel, listItemViewModel) =>
-                        listItemViewModel!..update(viewModel),
-                  ),
-                ],
-                child: SavedMessagesListItem(),
-              );
-            } else if (chatViewModel is DialogViewModel) {
-              return SwipeableChatItem(
-                chatId: chatViewModel.chat.id,
-                onMute: () {},
-                onLock: () {},
-                onDelete: () {},
-                onArchive: () {},
-                child: MultiProvider(
-                providers: [
-                  ChangeNotifierProvider<ChatViewModel>.value(
-                    value: chatViewModel,
-                  ),
-                  ChangeNotifierProvider<DialogViewModel>.value(
-                    value: chatViewModel,
-                  ),
-                  ChangeNotifierProxyProvider<DialogViewModel,
-                      DialogListItemViewModel>(
-                    create: (_) => DialogListItemViewModel(),
-                    update: (_, viewModel, listItemViewModel) =>
-                        listItemViewModel!..update(viewModel),
-                  ),
-                ],
-                child: DialogListItem(),
-                ),
-              );
-            } else if (chatViewModel is GroupViewModel) {
-              return SwipeableChatItem(
-                chatId: chatViewModel.chat.id,
-                onMute: () {},
-                onLock: () {},
-                onDelete: () {},
-                onArchive: () {},
-                child: MultiProvider(
-                providers: [
-                  ChangeNotifierProvider<ChatViewModel>.value(
-                    value: chatViewModel,
-                  ),
-                  ChangeNotifierProvider<GroupViewModel>.value(
-                    value: chatViewModel,
-                  ),
-                  ChangeNotifierProxyProvider<GroupViewModel,
-                      DialogListItemViewModel>(
-                    create: (_) => DialogListItemViewModel(),
-                    update: (_, viewModel, listItemViewModel) =>
-                        listItemViewModel!..updateGroupViewModel(viewModel),
-                  ),
-                ],
-                child: DialogListItem(),
-                ),
-              );
-            } else {
-              return const SizedBox.shrink();
+        if (_chatStore.isLoading && !_chatStore.chatsLoaded) {
+          return ListView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
+            children: [
+              _buildArchiveItem(),
+              for (int i = 0; i < 10; i++) ChatLoadingListItem(),
+            ],
+          );
+        }
+
+
+        if (_chatStore.error != null) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Text(
+                'Ошибка: ${_chatStore.error}',
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+          );
+        }
+
+
+        final filteredChats = _getFilteredChats(_chatStore.chats);
+
+        return ListView.builder(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: filteredChats.length + 1, 
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return _buildArchiveItem();
             }
-          },
-          itemCount: filteredChats.length + 1,
+            final chat = filteredChats[index - 1];
+            return Column(
+              children: [
+                ChatListItem(chat: chat),
+                const Divider(height: 0.5),
+              ],
             );
           },
         );
@@ -334,166 +278,124 @@ class _ChatsScreenState extends State<ChatsScreen> {
     );
   }
 
-  List<ChatViewModel> _getFilteredChats(List<ChatViewModel> allChats) {
+  List<ChatEntity> _getFilteredChats(ObservableList<ChatEntity> allChats) {
+    final chatsList = allChats.toList();
     switch (_selectedTabIndex) {
-      case 0: // Все
-        return allChats;
-      case 1: // Личные
-        return allChats.where((chat) => chat is DialogViewModel).toList();
-      case 2: // Сохраненные
-        return allChats.where((chat) => chat is SavedMessagesViewModel).toList();
-      case 3: // Системные
-        return [];
+      case 0: 
+        return chatsList;
+      case 1: 
+        return chatsList.where((chat) => chat.type == 'dialog').toList();
+      case 2: 
+        return chatsList.where((chat) => chat.type == 'saved_messages').toList();
+      case 3: 
+        return <ChatEntity>[];
       default:
-        return allChats;
+        return chatsList;
     }
-  }
-
-  Widget _buildChatListLoader() {
-    return ListView(
-      physics: NeverScrollableScrollPhysics(),
-      children: <Widget>[
-        for (int i = 0; i < 12; i++) ChatLoadingListItem(),
-      ],
-    );
   }
 
   Widget _buildArchiveItem() {
     return InkWell(
       onTap: _toggleArchive,
-      child: SizedBox(
+      child: Container(
         height: 72.0,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AspectRatio(
-                aspectRatio: 1.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1677FF),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      'assets/bottom/archive.svg',
-                      width: 24.0,
-                      height: 24.0,
-                    ),
-                  ),
+            Container(
+              width: 56.0,
+              height: 56.0,
+              decoration: const BoxDecoration(
+                color: Color(0xFF1677FF),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/bottom/archive.svg',
+                  width: 24.0,
+                  height: 24.0,
                 ),
               ),
             ),
+            const SizedBox(width: 12.0),
             Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(right: 14.0),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Column(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 3.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Архив',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 17.0,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 48.0,
-                                  margin: const EdgeInsets.only(
-                                    left: 6.0,
-                                    bottom: 2.0,
-                                  ),
-                                  child: Text(
-                                    '01.09',
-                                    maxLines: 1,
-                                    textAlign: TextAlign.end,
-                                    style: TextStyle(
-                                      fontSize: 13.0,
-                                      fontWeight: FontWeight.normal,
-                                      color: Color.fromARGB(255, 130, 143, 152),
-                                    ),
-                                  ),
-                                ),
-                              ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Архив',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 48.0,
+                        margin: const EdgeInsets.only(left: 6.0),
+                        child: const Text(
+                          '01.09',
+                          maxLines: 1,
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromARGB(255, 130, 143, 152),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Артём, Елена',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromARGB(255, 130, 143, 152),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 2.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[700],
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 20.0,
+                          minHeight: 20.0,
+                        ),
+                        child: const Center(
+                          child: Text(
+                            '2',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 3.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Артём, Елена',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.normal,
-                                      color: Color.fromARGB(255, 130, 143, 152),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 48.0,
-                                  margin: const EdgeInsets.only(left: 6.0),
-                                  child: UnconstrainedBox(
-                                    alignment: Alignment.centerRight,
-                                    child: Container(
-                                      height: 24.0,
-                                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                      constraints: BoxConstraints(
-                                        minWidth: 24.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-                                        color: Colors.grey[700],
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          '2',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      right: -14.0,
-                      child: Divider(height: 0.5),
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -502,4 +404,3 @@ class _ChatsScreenState extends State<ChatsScreen> {
     );
   }
 }
-

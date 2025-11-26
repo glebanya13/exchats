@@ -24,7 +24,7 @@ class SwipeableChatItem extends StatelessWidget {
       key: Key(chatId),
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) async {
-        // Prevent dismissal - we just want to show actions
+
         return false;
       },
       background: Container(
@@ -56,8 +56,8 @@ class SwipeableChatItem extends StatelessWidget {
         ),
       ),
       onDismissed: (direction) {
-        // This won't be called because confirmDismiss returns false
-        // But we need to provide it to avoid the warning
+
+
       },
       child: child,
     );

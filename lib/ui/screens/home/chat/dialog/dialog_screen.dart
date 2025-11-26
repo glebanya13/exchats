@@ -2,20 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:exchats/models/message.dart';
-import 'package:exchats/models/user_details.dart';
-import 'package:exchats/services/auth_service.dart';
-import 'package:exchats/services/user_service.dart';
+import 'package:exchats/domain/entity/message_entity.dart';
+import 'package:exchats/domain/entity/user_entity.dart';
+import 'package:exchats/domain/entity/chat_entity.dart';
 import 'package:exchats/ui/screens/home/chat/shared_widgets/message_input.dart';
 import 'package:exchats/ui/screens/home/chat/user_profile_screen.dart';
 import 'package:exchats/ui/screens/home/chat/group_profile_screen.dart';
 import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
 import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
-import 'package:exchats/view_models/home/chats/dialog_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/group_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/chat_viewmodel.dart';
 import 'package:exchats/ui/screens/home/call/active_call_screen.dart';
 import 'package:exchats/locator.dart';
+import 'package:exchats/presentation/store/auth_store.dart';
+import 'package:exchats/presentation/store/message_store.dart';
+import 'package:exchats/presentation/store/chat_store.dart';
+import 'package:exchats/presentation/store/user_store.dart';
+import 'package:exchats/domain/usecase/user_usecase.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 import 'widgets/message_bubble.dart';
 import 'widgets/message_selection_bar.dart';
@@ -33,12 +36,17 @@ class DialogArguments {
 
   final String id;
   final String title;
-  final Message lastMessage;
+  final MessageEntity lastMessage;
   final String dialogUserId;
 }
 
 class DialogScreen extends StatefulWidget {
-  const DialogScreen({Key? key}) : super(key: key);
+  final String chatId;
+  
+  const DialogScreen({
+    Key? key,
+    required this.chatId,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _DialogScreenState();
@@ -48,24 +56,64 @@ class _DialogScreenState extends State<DialogScreen>
     with WidgetsBindingObserver {
   final GlobalKey<AnimatedListState> _messagesListKey = GlobalKey();
   final Set<String> _selectedMessageIds = {};
-  final Map<String, Message> _messagesMap = {};
-  final Map<String, UserDetails?> _usersMap = {};
-  Message? _replyToMessage;
-  UserDetails? _replyToUser;
+  final Map<String, MessageEntity> _messagesMap = {};
+  final Map<String, UserEntity?> _usersMap = {};
+  MessageEntity? _replyToMessage;
+  UserEntity? _replyToUser;
   bool _isSelectionMode = false;
+
+  late final MessageStore _messageStore;
+  late final ChatStore _chatStore;
+  late final AuthStore _authStore;
+  late final UserStore _userStore;
+  
+  ChatEntity? _currentChat;
+  UserEntity? _otherUser;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
+    _messageStore = locator<MessageStore>();
+    _chatStore = locator<ChatStore>();
+    _authStore = locator<AuthStore>();
+    _userStore = locator<UserStore>();
+    
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      final chatViewModel = context.read<ChatViewModel>();
-      if (chatViewModel is DialogViewModel) {
-        chatViewModel.initialize();
-      } else if (chatViewModel is GroupViewModel) {
-        chatViewModel.initialize();
-      }
+
+      _loadChatInfo();
+
+      _messageStore.watchMessages(widget.chatId);
     });
+  }
+  
+  Future<void> _loadChatInfo() async {
+    final chat = await _chatStore.getChatById(widget.chatId);
+    if (chat != null) {
+      setState(() {
+        _currentChat = chat;
+      });
+      
+
+      if (chat.type == 'dialog') {
+        final currentUserId = _authStore.currentUserId ?? '';
+        final otherUserId = chat.users.firstWhere(
+          (userId) => userId != currentUserId,
+          orElse: () => '',
+        );
+        if (otherUserId.isNotEmpty) {
+          try {
+            final userUseCase = locator<UserUseCase>();
+            final user = await userUseCase.getUserById(otherUserId);
+            setState(() {
+              _otherUser = user;
+            });
+          } catch (e) {
+
+          }
+        }
+      }
+    }
   }
 
   @override
@@ -83,18 +131,23 @@ class _DialogScreenState extends State<DialogScreen>
       });
       return true;
     }
-    Navigator.of(context).pop();
+    context.pop();
     return true;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authService = locator<AuthService>();
-    final userService = locator<UserService>();
+
+
+
 
     return Scaffold(
-      appBar: _isSelectionMode ? _buildSelectionAppBar(theme) : _buildNormalAppBar(theme, authService, userService),
+          appBar: _isSelectionMode 
+              ? _buildSelectionAppBar(theme) 
+              : (_currentChat?.type == 'group' 
+                  ? _buildGroupAppBar(theme) 
+                  : _buildDialogAppBar(theme)),
       body: Stack(
         children: <Widget>[
           Container(
@@ -103,7 +156,7 @@ class _DialogScreenState extends State<DialogScreen>
           ),
           Column(
             children: <Widget>[
-              _buildMessageList(userService, authService),
+              _buildMessageList(),
               if (_isSelectionMode)
                 MessageSelectionBar(
                   selectedCount: _selectedMessageIds.length,
@@ -117,20 +170,21 @@ class _DialogScreenState extends State<DialogScreen>
                         _isSelectionMode = false;
                         _selectedMessageIds.clear();
                       });
-                      if (message != null && _replyToUser == null) {
-                        userService.getUserById(id: message.owner).then((user) {
-                          if (user != null && mounted) {
-                            setState(() {
-                              _usersMap[message.owner] = user;
-                              _replyToUser = user;
-                            });
-                          }
-                        });
-                      }
+
+
+
+
+
+
+
+
+
+
+
                     }
                   },
                   onForward: () {
-                    // TODO: Implement forward
+
                     _exitSelectionMode();
                   },
                   onCopy: () {
@@ -204,171 +258,131 @@ class _DialogScreenState extends State<DialogScreen>
     );
   }
 
-  PreferredSizeWidget _buildNormalAppBar(ThemeData theme, AuthService authService, UserService userService) {
-    final chatViewModel = context.read<ChatViewModel>();
+  PreferredSizeWidget _buildDialogAppBar(ThemeData theme) {
+    final userName = _otherUser != null 
+        ? '${_otherUser!.firstName} ${_otherUser!.lastName}'.trim()
+        : 'Пользователь';
+    final userStatus = _otherUser?.online == true ? 'В сети' : 'Не в сети';
+    final userId = _otherUser?.id ?? '';
     
-    if (chatViewModel is DialogViewModel) {
-      return _buildDialogAppBar(theme, chatViewModel);
-    } else if (chatViewModel is GroupViewModel) {
-      return _buildGroupAppBar(theme, chatViewModel);
-    }
-    
-    return AppBar(title: const Text('Chat'));
-  }
-
-  PreferredSizeWidget _buildDialogAppBar(ThemeData theme, DialogViewModel model) {
     return AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        titleSpacing: 8.0,
-        title: Row(
-          children: <Widget>[
-            GestureDetector(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      titleSpacing: 8.0,
+      title: Row(
+        children: <Widget>[
+          GestureDetector(
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => UserProfileScreen(
-                      userId: model.dialogUserId,
-                      userName: model.title,
-                      userStatus: model.dialogUserOnlineStatus,
-                    ),
-                  ),
-                );
+                if (userId.isNotEmpty) {
+                  context.push(
+                    '/user_profile?userId=$userId&userName=${Uri.encodeComponent(userName)}&userStatus=${Uri.encodeComponent(userStatus)}',
+                  );
+                }
               },
-              child: Container(
-                width: 42.0,
-                height: 42.0,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF9C27B0),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/profile/user.svg',
-                    width: 24.0,
-                    height: 24.0,
-                    colorFilter: const ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
-                    ),
+            child: Container(
+              width: 42.0,
+              height: 42.0,
+              decoration: BoxDecoration(
+                color: const Color(0xFF9C27B0),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/profile/user.svg',
+                  width: 24.0,
+                  height: 24.0,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
                   ),
                 ),
               ),
             ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => UserProfileScreen(
-                        userId: model.dialogUserId,
-                        userName: model.title,
-                        userStatus: model.dialogUserOnlineStatus,
-                      ),
-                    ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                if (userId.isNotEmpty) {
+                  context.push(
+                    '/user_profile?userId=$userId&userName=${Uri.encodeComponent(userName)}&userStatus=${Uri.encodeComponent(userStatus)}',
                   );
-                },
+                }
+              },
               child: Container(
                 margin: const EdgeInsets.only(left: 12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Selector<DialogViewModel, String>(
-                      selector: (context, model) => model.title,
-                      builder: (context, title, child) {
-                        return Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                          ),
-                        );
-                      },
+                    Text(
+                      userName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
-                    Selector<DialogViewModel, String>(
-                      selector: (context, model) =>
-                          model.dialogUserOnlineStatus,
-                      builder: (context, dialogUserOnlineStatus, child) {
-                        return Text(
-                          dialogUserOnlineStatus,
-                          style: const TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.normal,
-                              color: Color(0xFF1677FF),
-                          ),
-                        );
-                      },
+                    Text(
+                      userStatus,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.normal,
+                        color: _otherUser?.online == true 
+                            ? const Color(0xFF1677FF)
+                            : Colors.grey[600]!,
+                      ),
                     ),
                   ],
-                  ),
                 ),
               ),
             ),
-          ],
-        ),
-        automaticallyImplyLeading: false,
-        leading: AppBarIconButton(
-          icon: Icons.arrow_back,
-          iconColor: Colors.black87,
-          onTap: () => Navigator.of(context).pop(),
-        ),
-        actions: <Widget>[
-        Consumer<DialogViewModel>(
-          builder: (context, model, child) {
-            return AppBarIconButton(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ActiveCallScreen(
-                      userId: model.dialogUserId,
-                      userName: model.title,
-                      isVideoCall: false,
-                    ),
-                  ),
-                );
-              },
-              icon: Icons.phone,
-              iconSize: 24.0,
-              iconColor: Colors.grey.shade600,
-            );
-          },
-        ),
-          Transform.rotate(
-            angle: 1.5708, // 90 degrees in radians
-            child: AppBarIconButton(
-              onTap: () {},
-              icon: Icons.more_vert,
-              iconSize: 24.0,
-              iconColor: Colors.grey.shade600,
-            ),
           ),
         ],
+      ),
+      automaticallyImplyLeading: false,
+      leading: AppBarIconButton(
+        icon: Icons.arrow_back,
+        iconColor: Colors.black87,
+        onTap: () => context.pop(),
+      ),
+      actions: <Widget>[
+        AppBarIconButton(
+          onTap: () {
+            if (userId.isNotEmpty) {
+              context.push(
+                '/active_call?userId=$userId&userName=${Uri.encodeComponent(userName)}&isVideoCall=false',
+              );
+            }
+          },
+          icon: Icons.phone,
+          iconSize: 24.0,
+          iconColor: Colors.grey.shade600,
+        ),
+        Transform.rotate(
+          angle: 1.5708, 
+          child: AppBarIconButton(
+            onTap: () {},
+            icon: Icons.more_vert,
+            iconSize: 24.0,
+            iconColor: Colors.grey.shade600,
+          ),
+        ),
+      ],
     );
   }
 
-  PreferredSizeWidget _buildGroupAppBar(ThemeData theme, GroupViewModel model) {
+  PreferredSizeWidget _buildGroupAppBar(ThemeData theme) {
+    final groupName = _currentChat != null ? 'Группа ${_currentChat!.id}' : 'Группа';
+    
     return AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         titleSpacing: 8.0,
         title: GestureDetector(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ChangeNotifierProvider.value(
-                  value: model,
-                  child: ChangeNotifierProvider.value(
-                    value: model as ChatViewModel,
-                    child: GroupProfileScreen(
-                      groupId: model.chat.id,
-                      groupName: model.title,
-                    ),
-                  ),
-                ),
-              ),
+            context.push(
+              '/group_profile?groupId=${widget.chatId}&groupName=${Uri.encodeComponent(groupName)}',
             );
           },
           child: Row(
@@ -397,20 +411,15 @@ class _DialogScreenState extends State<DialogScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Selector<GroupViewModel, String>(
-                        selector: (context, model) => model.title,
-                        builder: (context, title, child) {
-                          return Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          );
-                        },
+                      Text(
+                        groupName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                       const Text(
                         'Группа',
@@ -431,7 +440,7 @@ class _DialogScreenState extends State<DialogScreen>
         leading: AppBarIconButton(
           icon: Icons.arrow_back,
           iconColor: Colors.black87,
-          onTap: () => Navigator.of(context).pop(),
+          onTap: () => context.pop(),
         ),
         actions: <Widget>[
           AppBarIconButton(
@@ -442,7 +451,7 @@ class _DialogScreenState extends State<DialogScreen>
           ),
           PopupMenuButton<String>(
             icon: Transform.rotate(
-              angle: 1.5708, // 90 degrees in radians
+              angle: 1.5708, 
               child: Icon(Icons.more_vert, color: Colors.grey.shade600, size: 24.0),
             ),
             onSelected: (value) {
@@ -512,19 +521,15 @@ class _DialogScreenState extends State<DialogScreen>
   }
 
 
-  Widget _buildMessageList(UserService userService, AuthService authService) {
-    return Consumer<ChatViewModel>(
-      builder: (context, chatViewModel, child) {
-        List<Message> messages = [];
-        if (chatViewModel is DialogViewModel) {
-          messages = chatViewModel.messages;
-        } else if (chatViewModel is GroupViewModel) {
-          messages = chatViewModel.messages;
-        }
-        // Filter out empty messages
-        messages = messages.where((msg) => msg.text.isNotEmpty || msg.type != MessageType.Text).toList();
-        final currentUserId = authService.currentUserId ?? '';
+  Widget _buildMessageList() {
+    final currentUserId = _authStore.currentUserId ?? '';
+    
+    return Observer(
+      builder: (_) {
+        final messages = _messageStore.messages.toList();
 
+        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        
         _messagesMap.clear();
         for (var msg in messages) {
           _messagesMap[msg.id] = msg;
@@ -536,15 +541,13 @@ class _DialogScreenState extends State<DialogScreen>
             thickness: 4.0,
             child: ListView.builder(
               key: _messagesListKey,
-              controller: chatViewModel is DialogViewModel 
-                  ? (chatViewModel as DialogViewModel).scrollController
-                  : (chatViewModel as GroupViewModel).scrollController,
+              controller: ScrollController(), 
               itemCount: messages.length + 1,
               reverse: true,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  final isDialog = chatViewModel is DialogViewModel;
-                  UserDetails? typingUser;
+                  final isDialog = true; 
+                  UserEntity? typingUser;
                   if (!isDialog && messages.isNotEmpty) {
                     final lastMessage = messages.first;
                     if (lastMessage.owner != currentUserId) {
@@ -565,36 +568,38 @@ class _DialogScreenState extends State<DialogScreen>
                     previousMessage.owner != message.owner ||
                     message.createdAt.difference(previousMessage.createdAt).inMinutes > 5;
 
-                Message? replyToMsg;
-                UserDetails? replyToUser;
+                MessageEntity? replyToMsg;
+                UserEntity? replyToUser;
                 if (message.replyTo != null) {
                   replyToMsg = _messagesMap[message.replyTo];
                   if (replyToMsg != null) {
                     replyToUser = _usersMap[replyToMsg.owner];
                     if (replyToUser == null) {
-                      userService.getUserById(id: replyToMsg.owner).then((user) {
-                        if (user != null) {
-                          setState(() {
-                            _usersMap[replyToMsg!.owner] = user;
-                          });
-                        }
-                      });
+
+
+
+
+
+
+
+
                     }
                   }
                 }
 
-                UserDetails? messageUser = _usersMap[message.owner];
-                if (messageUser == null) {
-                  userService.getUserById(id: message.owner).then((user) {
-                    if (user != null) {
-                      setState(() {
-                        _usersMap[message.owner] = user;
-                      });
-                    }
-                  });
-                }
+                UserEntity? messageUser = _usersMap[message.owner];
 
-                final isDialog = chatViewModel is DialogViewModel;
+
+
+
+
+
+
+
+
+
+
+                final isDialog = true; 
                 final shouldShowAvatar = isDialog ? false : !isOwnMessage;
                 
                 return MessageBubble(
@@ -625,16 +630,17 @@ class _DialogScreenState extends State<DialogScreen>
                     setState(() {
                       _replyToMessage = message;
                       _replyToUser = messageUser;
-                      if (messageUser == null) {
-                        userService.getUserById(id: message.owner).then((user) {
-                          if (user != null && mounted) {
-                            setState(() {
-                              _usersMap[message.owner] = user;
-                              _replyToUser = user;
-                            });
-                          }
-                        });
-                      }
+
+
+
+
+
+
+
+
+
+
+
                     });
                   },
                 );
@@ -672,7 +678,7 @@ class _DialogScreenState extends State<DialogScreen>
   }
 
   void _showMessageContextMenu(
-      BuildContext context, Message message) {
+      BuildContext context, MessageEntity message) {
     MessageContextMenu.show(
       context,
       message,

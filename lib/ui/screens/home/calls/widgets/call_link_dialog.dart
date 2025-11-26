@@ -19,7 +19,7 @@ class CallLinkDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-              // Close button
+
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
                 child: Row(
@@ -34,7 +34,7 @@ class CallLinkDialog extends StatelessWidget {
                   ],
                 ),
               ),
-              // Link icon
+
               Container(
                 width: 48.0,
                 height: 48.0,
@@ -43,7 +43,7 @@ class CallLinkDialog extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Transform.rotate(
-                  angle: 0.785398, // 45 degrees in radians
+                  angle: 0.785398, 
                   child: const Icon(
                     Icons.link,
                     color: Colors.white,
@@ -52,7 +52,7 @@ class CallLinkDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24.0),
-              // Title
+
               const Text(
                 'Ссылка на звонок',
                 style: TextStyle(
@@ -62,7 +62,7 @@ class CallLinkDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12.0),
-              // Description
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Text(
@@ -75,7 +75,7 @@ class CallLinkDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24.0),
-              // Link field
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
@@ -114,7 +114,7 @@ class CallLinkDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24.0),
-              // Action buttons
+
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 24.0),
                 child: Row(
@@ -148,7 +148,7 @@ class CallLinkDialog extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: Implement share
+
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1677FF),

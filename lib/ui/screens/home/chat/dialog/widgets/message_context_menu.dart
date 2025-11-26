@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:exchats/models/message.dart';
+import 'package:exchats/domain/entity/message_entity.dart';
 
 class MessageContextMenu {
   static void show(
     BuildContext context,
-    Message message, {
+    MessageEntity message, {
     VoidCallback? onReply,
     VoidCallback? onCopy,
     VoidCallback? onForward,

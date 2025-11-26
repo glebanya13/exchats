@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
-import 'package:exchats/view_models/home/chats/group_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/chat_viewmodel.dart';
-import 'package:exchats/services/user_service.dart';
-import 'package:exchats/services/auth_service.dart';
 import 'package:exchats/locator.dart';
-import 'package:exchats/models/user_details.dart';
+import 'package:exchats/presentation/store/user_store.dart';
+import 'package:exchats/presentation/store/auth_store.dart';
+import 'package:exchats/domain/entity/user_entity.dart';
 
 class GroupProfileScreen extends StatefulWidget {
   final String groupId;
@@ -28,9 +27,9 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTabIndex = 0;
-  final UserService _userService = locator<UserService>();
-  final AuthService _authService = locator<AuthService>();
-  List<UserDetails> _participants = [];
+  final UserStore _userStore = locator<UserStore>();
+  final AuthStore _authStore = locator<AuthStore>();
+  List<UserEntity> _participants = [];
   bool _notificationsEnabled = true;
 
   @override
@@ -52,23 +51,14 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
   }
 
   Future<void> _loadParticipants() async {
-    final chatViewModel = context.read<ChatViewModel>();
-    if (chatViewModel is GroupViewModel) {
-      final chat = chatViewModel.chat;
-      final participants = <UserDetails>[];
-      for (final userId in chat.users) {
-        final user = await _userService.getUserById(id: userId);
-        if (user != null) {
-          participants.add(user);
-        }
-      }
-      setState(() {
-        _participants = participants;
-      });
-    }
+
+
+    setState(() {
+      _participants = [];
+    });
   }
 
-  void _showParticipantMenu(BuildContext context, UserDetails user, Offset tapPosition) {
+  void _showParticipantMenu(BuildContext context, UserEntity user, Offset tapPosition) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     showMenu(
       context: context,
@@ -92,7 +82,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
             ],
           ),
           onTap: () {
-            // TODO: Implement change permissions
+
           },
         ),
         PopupMenuItem(
@@ -115,7 +105,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
             ],
           ),
           onTap: () {
-            // TODO: Implement remove from group
+
           },
         ),
       ],
@@ -124,20 +114,6 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    final chatViewModel = context.watch<ChatViewModel>();
-    if (chatViewModel is! GroupViewModel) {
-      return Scaffold(
-        appBar: AppBar(
-          leading: AppBarIconButton(
-            icon: Icons.arrow_back,
-            iconColor: Colors.black87,
-            onTap: () => Navigator.of(context).pop(),
-          ),
-        ),
-        body: Center(child: Text('Ошибка загрузки группы')),
-      );
-    }
-
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -146,7 +122,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
         leading: AppBarIconButton(
           icon: Icons.arrow_back,
           iconColor: Colors.black87,
-          onTap: () => Navigator.of(context).pop(),
+          onTap: () => context.pop(),
         ),
         actions: [
           AppBarIconButton(
@@ -156,14 +132,14 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
           ),
           PopupMenuButton<String>(
             icon: Transform.rotate(
-              angle: 1.5708, // 90 degrees in radians
+              angle: 1.5708, 
               child: Icon(Icons.more_vert, color: Colors.black87),
             ),
             onSelected: (value) {
               if (value == 'search') {
-                // TODO: Implement search
+
               } else if (value == 'leave') {
-                // TODO: Implement leave group
+
               }
             },
             itemBuilder: (context) => [
@@ -200,7 +176,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Group Header
+
             Container(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -256,7 +232,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                 ],
               ),
             ),
-            // Notifications Section
+
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               padding: const EdgeInsets.all(16.0),
@@ -310,12 +286,12 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                 ],
               ),
             ),
-            // Add Participants Button
+
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
               child: InkWell(
                 onTap: () {
-                  // TODO: Implement add participants
+
                 },
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
@@ -351,7 +327,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                 ),
               ),
             ),
-            // Participants List
+
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
               decoration: BoxDecoration(
@@ -472,7 +448,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
               ),
             ),
             const SizedBox(height: 16.0),
-            // Tabs
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
@@ -499,7 +475,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                         ],
                       ),
                     ),
-                    // Tab Content
+
                     IndexedStack(
                       index: _selectedTabIndex,
                       children: [

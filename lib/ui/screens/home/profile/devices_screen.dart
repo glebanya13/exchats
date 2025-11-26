@@ -21,7 +21,7 @@ class DevicesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16.0),
-            // This device section
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -45,7 +45,7 @@ class DevicesScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12.0),
-            // End other sessions button
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
@@ -75,7 +75,7 @@ class DevicesScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24.0),
-            // Active sessions section
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(

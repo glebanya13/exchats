@@ -3,15 +3,8 @@ import 'package:flutter/painting.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:exchats/models/message.dart';
 import 'package:exchats/ui/screens/home/chat/dialog/dialog_screen.dart';
 import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
-import 'package:exchats/ui/theming/theme_manager.dart';
-import 'package:exchats/util/slide_left_with_fade_route.dart';
-import 'package:exchats/view_models/home/chats/dialog_list_item_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/dialog_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/group_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/chat_viewmodel.dart';
 
 class DialogListItem extends StatefulWidget {
   DialogListItem({Key? key}) : super(key: key);
@@ -28,7 +21,7 @@ class _DialogListItemState extends State<DialogListItem> {
         final chatViewModel = context.read<ChatViewModel>();
         if (chatViewModel is DialogViewModel) {
           Navigator.of(context).push(
-            SlideWithFadeRoute(
+            MaterialPageRoute(
               builder: (_) => MultiProvider(
                 providers: [
                   ChangeNotifierProvider<ChatViewModel>.value(
@@ -44,7 +37,7 @@ class _DialogListItemState extends State<DialogListItem> {
           );
         } else if (chatViewModel is GroupViewModel) {
           Navigator.of(context).push(
-            SlideWithFadeRoute(
+            MaterialPageRoute(
               builder: (_) => MultiProvider(
                 providers: [
                   ChangeNotifierProvider<ChatViewModel>.value(
@@ -98,7 +91,7 @@ class _DialogListItemState extends State<DialogListItem> {
   }
 
   Widget _buildLeading() {
-    final theme = ThemeManager.of(context).currentTheme;
+    final theme = Theme.of(context);
 
     return Stack(
       children: <Widget>[
@@ -115,7 +108,7 @@ class _DialogListItemState extends State<DialogListItem> {
               aspectRatio: 1.0,
               child: Container(
                 decoration: BoxDecoration(
-                  color: theme.data.colorScheme.secondary,
+                  color: theme.colorScheme.secondary,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -140,7 +133,7 @@ class _DialogListItemState extends State<DialogListItem> {
             if (chatViewModel is DialogViewModel) {
               dialogUserOnline = chatViewModel.dialogUserOnline;
             }
-            // GroupViewModel не имеет dialogUserOnline, поэтому для групп не показываем индикатор
+
             return Positioned(
               right: 0.0,
               bottom: 0.0,
@@ -162,7 +155,7 @@ class _DialogListItemState extends State<DialogListItem> {
                         width: 16.0,
                         height: 16.0,
                         decoration: BoxDecoration(
-                          color: theme.data.scaffoldBackgroundColor,
+                          color: theme.scaffoldBackgroundColor,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -170,7 +163,7 @@ class _DialogListItemState extends State<DialogListItem> {
                             width: 12.0,
                             height: 12.0,
                             decoration: BoxDecoration(
-                              color: theme.data.colorScheme.secondary,
+                              color: theme.colorScheme.secondary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -247,7 +240,7 @@ class _DialogListItemState extends State<DialogListItem> {
   }
 
   Widget _buildSubtitle() {
-    final theme = ThemeManager.of(context).currentTheme;
+    final theme = Theme.of(context);
 
     return Expanded(
       child: Padding(
@@ -300,7 +293,7 @@ class _DialogListItemState extends State<DialogListItem> {
                           shape: BoxShape.rectangle,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(12.0)),
-                          color: theme.data.colorScheme.secondary,
+                          color: theme.colorScheme.secondary,
                         ),
                         child: Center(
                           child: Text(

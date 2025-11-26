@@ -1,88 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:exchats/locator.dart';
-import 'package:exchats/ui/theming/theme_provider.dart';
-import 'package:exchats/services/auth_service.dart';
-import 'package:exchats/ui/router.dart';
-import 'package:exchats/ui/theming/material_themes.dart' show MaterialThemes, TextThemeExtension;
-import 'package:exchats/ui/theming/theme_manager.dart';
+import 'locator.dart';
+import 'presentation/router/app_router.dart';
+import 'presentation/store/auth_store.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupLocator();
+  await setupLocator();
+  
+
+  final authStore = locator<AuthStore>();
+  await authStore.checkAuthStatus();
+  
   runApp(TelegramCloneApp());
 }
 
-class TelegramCloneApp extends StatefulWidget {
-  @override
-  _TelegramCloneAppState createState() => _TelegramCloneAppState();
-}
-
-class _TelegramCloneAppState extends State<TelegramCloneApp> {
-  String _initialRoute = AppRoutes.Auth; // Начинаем с авторизации
-  bool _initialized = true;
-
+class TelegramCloneApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    if (!_initialized) {
-      return _SplashScreen();
-    }
-
-    return ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: _MainScreen(
-        initialRoute: _initialRoute,
-      ),
-    );
-  }
-}
-
-class _SplashScreen extends StatelessWidget {
-  const _SplashScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: MaterialThemes.lightTheme,
-      home: Scaffold(
-        body: Container(
-          child: Center(
-            child: Text(
-              'Telegram',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Color.fromARGB(255, 250, 255, 255),
-              ),
-            ),
-          ),
-        ),
-      ),
+    return MaterialApp.router(
+      title: 'Telegram',
+      routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class _MainScreen extends StatelessWidget {
-  const _MainScreen({
-    Key? key,
-    required this.initialRoute,
-  }) : super(key: key);
-
-  final String initialRoute;
-
-  @override
-  Widget build(BuildContext context) {
-    return ThemeManager(
-      builder: (context, theme) {
-        return MaterialApp(
-          title: 'Telegram',
-          theme: theme,
-          initialRoute: initialRoute,
-          onGenerateRoute: RootRouter.generateRoute,
-          debugShowCheckedModeBanner: false,
-        );
-      },
     );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:exchats/ui/screens/auth/router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:exchats/locator.dart';
+import 'package:exchats/presentation/store/auth_store.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -11,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  int _selectedTab = 0; // 0 = Phone, 1 = Email
+  int _selectedTab = 0; 
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   bool _isPhoneValid = false;
@@ -52,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo
+
                   Image.asset(
                     'assets/auth/logo.png',
                     width: 64.0,
@@ -70,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 24.0),
-                  // Title
+
                   Text(
                     'Авторизация',
                     style: TextStyle(
@@ -80,10 +82,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 32.0),
-                  // Tabs
+
                   _buildTabs(theme),
                   const SizedBox(height: 24.0),
-                  // Input field
+
                   _selectedTab == 0
                       ? _buildPhoneInput(theme)
                       : _buildEmailInput(theme),
@@ -103,10 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   const SizedBox(height: 24.0),
-                  // Next button
+
                   _buildNextButton(theme),
                   const SizedBox(height: 24.0),
-                  // Social login
+
                   _buildSocialLogin(theme),
                 ],
               ),
@@ -381,12 +383,10 @@ class _LoginScreenState extends State<LoginScreen> {
         onPressed: (isValid && !hasError)
             ? () {
                 if (_selectedTab == 0) {
-                  Navigator.of(context).pushNamed(
-                    AuthRoutes.Verification,
-                    arguments: {'phoneNumber': '+7${_phoneController.text}'},
-                  );
+                  final phoneNumber = '+7${_phoneController.text}';
+                  context.push('/auth/verification?phoneNumber=$phoneNumber');
                 } else {
-                  // TODO: Handle email login
+
                 }
               }
             : null,

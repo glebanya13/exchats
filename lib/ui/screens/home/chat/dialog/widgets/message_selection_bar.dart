@@ -37,7 +37,7 @@ class MessageSelectionBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Reply button - left corner
+
           InkWell(
             onTap: onReply,
             child: Row(
@@ -59,7 +59,7 @@ class MessageSelectionBar extends StatelessWidget {
               ],
             ),
           ),
-          // Forward button - right corner
+
           InkWell(
             onTap: onForward,
             child: Row(

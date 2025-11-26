@@ -86,7 +86,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar
+
             Container(
               margin: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -114,7 +114,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                 ),
               ),
             ),
-            // Create Call Link Button
+
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16.0),
               decoration: BoxDecoration(
@@ -143,7 +143,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                     child: Row(
                       children: [
                         Transform.rotate(
-                          angle: 0.785398, // 45 degrees in radians
+                          angle: 0.785398, 
                           child: Icon(
                             Icons.link,
                             color: const Color(0xFF1677FF),
@@ -166,7 +166,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
-            // Contacts List
+
             Expanded(
               child: ListView.builder(
                 itemCount: _filteredContacts.length,
@@ -193,7 +193,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    // TODO: Start call with selected contacts
+
                     Navigator.of(context).pop();
                   },
                   borderRadius: BorderRadius.circular(8.0),
@@ -225,7 +225,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Row(
           children: [
-            // Avatar
+
             Container(
               width: 48.0,
               height: 48.0,
@@ -246,7 +246,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
               ),
             ),
             const SizedBox(width: 16.0),
-            // Name
+
             Expanded(
               child: Text(
                 contact.name,

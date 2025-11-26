@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      mobx_codegen:
+        options:
+          generate_to_string: true
+

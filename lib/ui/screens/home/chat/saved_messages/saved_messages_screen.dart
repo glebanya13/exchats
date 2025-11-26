@@ -4,8 +4,6 @@ import 'package:exchats/ui/icons/app_icons.dart';
 import 'package:exchats/ui/screens/home/chat/shared_widgets/message_input.dart';
 import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
 import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
-import 'package:exchats/ui/theming/theme_manager.dart';
-import 'package:exchats/view_models/home/chats/saved_messages_viewmodel.dart';
 
 class SavedMessagesScreen extends StatefulWidget {
   const SavedMessagesScreen({Key? key}) : super(key: key);
@@ -38,7 +36,7 @@ class _SavedMessagesScreenState extends State<SavedMessagesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeManager.of(context).currentTheme;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +45,7 @@ class _SavedMessagesScreenState extends State<SavedMessagesScreen>
           children: <Widget>[
             RoundedAvatar(
               icon: AppIcons.saved_messages,
-              backgroundColor: theme.data.colorScheme.secondary,
+              backgroundColor: theme.colorScheme.secondary,
               radius: 21.0,
               iconSize: 21.0,
             ),
@@ -67,7 +65,7 @@ class _SavedMessagesScreenState extends State<SavedMessagesScreen>
                           style: TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.w500,
-                            color: theme.data.textTheme.displayLarge!.color,
+                            color: theme.textTheme.displayLarge!.color,
                           ),
                         );
                       },
@@ -122,7 +120,7 @@ class _SavedMessagesScreenState extends State<SavedMessagesScreen>
                 axisAlignment: -1.0,
                 sizeFactor: animation.drive(Tween<double>(begin: 0.0, end: 1.0)
                     .chain(CurveTween(curve: Curves.easeInOutCubic))),
-                // child: MessageListItem(model.messages[index]),
+
                 child: SizedBox.shrink(),
               );
             },
@@ -190,18 +188,18 @@ class MessagePainter extends CustomPainter {
 
     switch (position) {
       case MessagePosition.top:
-        // Top Left Border
+
         path.moveTo(offset, size.height - borderRadius.bottomLeft);
         path.cubicTo(offset, size.height * 0.5, offset, size.height * 0.5,
             offset, borderRadius.topLeft);
 
-        // Top Right Border
+
         path.quadraticBezierTo(offset, 0.0, offset + borderRadius.topLeft, 0.0);
         path.lineTo(size.width - borderRadius.topRight, 0.0);
         path.quadraticBezierTo(
             size.width, 0.0, size.width, borderRadius.topRight);
 
-        // Bottom Right Border
+
         path.cubicTo(
             size.width,
             size.height * 0.5,
@@ -212,25 +210,25 @@ class MessagePainter extends CustomPainter {
         path.quadraticBezierTo(size.width, size.height,
             size.width - borderRadius.bottomRight, size.height);
 
-        // Bottom Left Border
+
         path.lineTo(offset + (borderRadius.bottomLeft / 3.0), size.height);
         path.quadraticBezierTo(offset, size.height, offset,
             size.height - (borderRadius.bottomLeft / 3.0));
         break;
       case MessagePosition.center:
-        // Top Left Border
+
         path.moveTo(offset, size.height - (borderRadius.bottomLeft / 3.0));
         path.cubicTo(offset, size.height * 0.5, offset, size.height * 0.5,
             offset, (borderRadius.topLeft / 3.0));
 
-        // Top Right Border
+
         path.quadraticBezierTo(
             offset, 0.0, (borderRadius.topLeft / 3.0) + offset, 0.0);
         path.lineTo(size.width - borderRadius.topRight, 0.0);
         path.quadraticBezierTo(
             size.width, 0.0, size.width, borderRadius.topRight);
 
-        // Bottom Right Border
+
         path.cubicTo(
             size.width,
             size.height * 0.5,
@@ -241,18 +239,18 @@ class MessagePainter extends CustomPainter {
         path.quadraticBezierTo(size.width, size.height,
             size.width - borderRadius.bottomRight, size.height);
 
-        // Bottom Left Border
+
         path.lineTo(offset + (borderRadius.bottomLeft / 3.0), size.height);
         path.quadraticBezierTo(offset, size.height, offset,
             size.height - (borderRadius.bottomLeft / 3.0));
         break;
       case MessagePosition.bottom:
-        // Bottom Left Border
+
         path.moveTo(0.0, size.height - 1.0);
         path.quadraticBezierTo(offset, size.height - 2.0, offset,
             size.height - (borderRadius.bottomLeft / 3.0) - offset);
 
-        // Top Left Border
+
         path.cubicTo(
             offset,
             size.height * 0.5,
@@ -267,12 +265,12 @@ class MessagePainter extends CustomPainter {
                 offset,
             0.0);
 
-        // Top Right Border
+
         path.lineTo(size.width - borderRadius.topRight, 0.0);
         path.quadraticBezierTo(
             size.width, 0.0, size.width, borderRadius.topRight);
 
-        // Bottom Right Border
+
         path.cubicTo(
             size.width,
             size.height * 0.5,

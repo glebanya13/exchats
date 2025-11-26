@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
-import 'package:exchats/view_models/home/chats/dialog_viewmodel.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;
@@ -52,7 +52,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         leading: AppBarIconButton(
           icon: Icons.arrow_back,
           iconColor: Colors.black87,
-          onTap: () => Navigator.of(context).pop(),
+          onTap: () => context.pop(),
         ),
         actions: [
           AppBarIconButton(
@@ -65,12 +65,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Profile Header
+
             Padding(
               padding: const EdgeInsets.only(top: 24.0, bottom: 32.0),
               child: Column(
                 children: [
-                  // Avatar
+
                   Container(
                     width: 96.0,
                     height: 96.0,
@@ -91,7 +91,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  // Name
+
                   Text(
                     widget.userName,
                     style: const TextStyle(
@@ -101,7 +101,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     ),
                   ),
                   const SizedBox(height: 8.0),
-                  // Status
+
                   Text(
                     widget.userStatus ?? 'В сети',
                     style: const TextStyle(
@@ -111,7 +111,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     ),
                   ),
                   const SizedBox(height: 24.0),
-                  // Action Buttons
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Row(
@@ -149,7 +149,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 ],
               ),
             ),
-            // Profile Details
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
@@ -182,7 +182,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 ],
               ),
             ),
-            // Tabs
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
@@ -206,7 +206,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                         ],
                       ),
                     ),
-                    // Tab Content
+
                     IndexedStack(
                       index: _selectedTabIndex,
                       children: [
@@ -470,7 +470,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     ),
                     const SizedBox(height: 4.0),
                     Text(
-                      'https://www.instagram.co...sh=sdJ23',
+                      'https:
                       style: const TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.normal,

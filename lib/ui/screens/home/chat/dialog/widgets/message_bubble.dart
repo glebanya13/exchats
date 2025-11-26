@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:exchats/models/message.dart';
-import 'package:exchats/models/user_details.dart';
-import 'package:exchats/services/auth_service.dart';
+import 'package:exchats/domain/entity/message_entity.dart';
+import 'package:exchats/domain/entity/user_entity.dart';
 import 'package:exchats/locator.dart';
+import 'package:exchats/presentation/store/auth_store.dart';
 
 class MessageBubble extends StatelessWidget {
-  final Message message;
-  final Message? replyToMessage;
-  final UserDetails? replyToUser;
-  final UserDetails? messageUser;
+  final MessageEntity message;
+  final MessageEntity? replyToMessage;
+  final UserEntity? replyToUser;
+  final UserEntity? messageUser;
   final bool isSelected;
   final bool showAvatar;
   final VoidCallback? onTap;
@@ -34,9 +34,9 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authService = locator<AuthService>();
-    final isOwnMessage = message.owner == authService.currentUserId;
-    final isSystemMessage = message.type != MessageType.Text;
+    final authStore = locator<AuthStore>();
+    final isOwnMessage = message.owner == (authStore.currentUserId ?? '');
+    final isSystemMessage = message.type != 'text';
 
     if (isSystemMessage) {
       return _buildSystemMessage(context);
@@ -265,7 +265,7 @@ class MessageBubble extends StatelessWidget {
         border: Border(
           left: BorderSide(
             color: isOwnMessage
-                ? const Color(0xFF4CAF50) // Темно-зеленая граница для собственных сообщений
+                ? const Color(0xFF4CAF50) 
                 : const Color(0xFF1677FF),
             width: 3.0,
           ),
@@ -278,7 +278,7 @@ class MessageBubble extends StatelessWidget {
             replyToUser?.firstName ?? 'User',
             style: TextStyle(
               color: isOwnMessage
-                  ? const Color(0xFF4CAF50) // Зеленый цвет для имени в цитате собственных сообщений
+                  ? const Color(0xFF4CAF50) 
                   : const Color(0xFF1677FF),
               fontSize: 13.0,
               fontWeight: FontWeight.w600,
@@ -290,7 +290,7 @@ class MessageBubble extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: Colors.black87, // Черный текст для всех сообщений
+              color: Colors.black87, 
               fontSize: 13.0,
             ),
           ),
@@ -303,10 +303,10 @@ class MessageBubble extends StatelessWidget {
     String systemText = message.text;
     IconData? systemIcon;
 
-    if (message.type == MessageType.Call) {
+    if (message.type == 'call') {
       systemText = 'Звонок в ${DateFormat('HH:mm').format(message.createdAt)}';
       systemIcon = Icons.phone;
-    } else if (message.type == MessageType.VideoCall) {
+    } else if (message.type == 'video_call') {
       if (message.text.contains('начал')) {
         systemText = '${message.text} • Присоединились: ${message.participants?.join(', ') ?? ''}';
       } else if (message.text.contains('завершился')) {
@@ -314,7 +314,7 @@ class MessageBubble extends StatelessWidget {
         systemText = 'Видеозвонок завершился • Продолжительность: $duration минут';
       }
       systemIcon = Icons.videocam;
-    } else if (message.type == MessageType.GroupCreated) {
+    } else if (message.type == 'group_created') {
       systemText = 'Группа создана';
     }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:exchats/models/call.dart';
+import 'package:exchats/domain/entity/call_entity.dart';
 import 'package:exchats/ui/screens/home/call/active_call_screen.dart';
 
 import 'new_call_screen.dart';
@@ -15,7 +16,7 @@ class CallsScreen extends StatefulWidget {
 
 class _CallsScreenState extends State<CallsScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final List<Call> _calls = _generateMockCalls();
+  final List<CallEntity> _calls = _generateMockCalls();
 
   @override
   void dispose() {
@@ -76,9 +77,7 @@ class _CallsScreenState extends State<CallsScreen> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const NewCallScreen()),
-                    );
+                    context.push('/new_call');
                   },
                   borderRadius: BorderRadius.circular(8.0),
                   child: Padding(
@@ -140,7 +139,7 @@ class _CallsScreenState extends State<CallsScreen> {
     );
   }
 
-  Widget _buildCallItem(Call call, ThemeData theme) {
+  Widget _buildCallItem(CallEntity call, ThemeData theme) {
     final isMissed = call.type == CallType.Missed;
     final isIncoming = call.type == CallType.Incoming;
     final callCount = _getCallCount(call.userId);
@@ -162,14 +161,8 @@ class _CallsScreenState extends State<CallsScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ActiveCallScreen(
-                  userId: call.userId,
-                  userName: call.userName,
-                  isVideoCall: false,
-                ),
-              ),
+            context.push(
+              '/active_call?userId=${call.userId}&userName=${Uri.encodeComponent(call.userName)}&isVideoCall=false',
             );
           },
           borderRadius: BorderRadius.circular(8.0),
@@ -253,38 +246,38 @@ class _CallsScreenState extends State<CallsScreen> {
         .length;
   }
 
-  static List<Call> _generateMockCalls() {
+  static List<CallEntity> _generateMockCalls() {
     final now = DateTime.now();
     return [
-      Call(
+      CallEntity(
         id: 'call1',
         userId: 'user2',
         userName: 'Артём',
         type: CallType.Missed,
         date: now.subtract(const Duration(days: 1)),
       ),
-      Call(
+      CallEntity(
         id: 'call2',
         userId: 'user3',
         userName: 'Елена',
         type: CallType.Incoming,
         date: DateTime(2024, 10, 14, 20, 55),
       ),
-      Call(
+      CallEntity(
         id: 'call3',
         userId: 'user4',
         userName: 'Иван',
         type: CallType.Outgoing,
         date: DateTime(2024, 10, 12, 20, 55),
       ),
-      Call(
+      CallEntity(
         id: 'call4',
         userId: 'user5',
         userName: 'София',
         type: CallType.Incoming,
         date: DateTime(2024, 10, 10, 20, 55),
       ),
-      Call(
+      CallEntity(
         id: 'call5',
         userId: 'user6',
         userName: 'Дмитрий',

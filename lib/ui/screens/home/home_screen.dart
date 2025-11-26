@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
+import 'package:exchats/locator.dart';
 import 'package:exchats/ui/shared_widgets/safe_svg_icon.dart';
-import 'package:exchats/view_models/home/home_viewmodel.dart';
-import 'package:exchats/view_models/home/chats/chats_viewmodel.dart';
-import 'package:exchats/view_models/home/contacts/contacts_viewmodel.dart';
+import 'package:exchats/presentation/store/user_store.dart';
+import 'package:exchats/presentation/store/auth_store.dart';
 
 import 'calls/calls_screen.dart';
 import 'chats/chats_screen.dart';
@@ -12,58 +10,58 @@ import 'contacts/contacts_screen.dart';
 import 'profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
-
-  final List<Widget> _screens = [
-    ChangeNotifierProvider(
-      create: (_) => ChatsViewModel(),
-      child: ChatsScreen(),
-    ),
-    const CallsScreen(),
-    ChangeNotifierProvider(
-      create: (_) => ContactsViewModel(),
-      child: const ContactsScreen(),
-    ),
-    const ProfileScreen(),
-  ];
+  late final UserStore _userStore;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
+    _userStore = locator<UserStore>();
+    final authStore = locator<AuthStore>();
+    if (authStore.currentUserId != null) {
+      _userStore.watchUser(authStore.currentUserId!);
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final authStore = locator<AuthStore>();
+    if (authStore.currentUserId != null) {
     if (state == AppLifecycleState.resumed) {
-      context.read<HomeViewModel>().changeOnlineStatus(true);
+        _userStore.updateOnlineStatus(true);
     } else if (state == AppLifecycleState.inactive) {
-      context.read<HomeViewModel>().changeOnlineStatus(false);
+        _userStore.updateOnlineStatus(false);
+      }
     }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    return Consumer<HomeViewModel>(
-      builder: (context, model, child) {
         return Scaffold(
           body: IndexedStack(
             index: _currentIndex,
-            children: _screens,
+        children: [
+          ChatsScreen(),
+          CallsScreen(),
+          ContactsScreen(),
+          ProfileScreen(),
+        ],
           ),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,
@@ -104,11 +102,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           color: theme.colorScheme.secondary,
                           shape: BoxShape.circle,
                         ),
-                        constraints: BoxConstraints(
+                    constraints: const BoxConstraints(
                           minWidth: 18.0,
                           minHeight: 18.0,
                         ),
-                        child: Center(
+                    child: const Center(
                           child: Text(
                             '19',
                             style: TextStyle(
@@ -152,11 +150,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           color: theme.colorScheme.secondary,
                           shape: BoxShape.circle,
                         ),
-                        constraints: BoxConstraints(
+                    constraints: const BoxConstraints(
                           minWidth: 18.0,
                           minHeight: 18.0,
                         ),
-                        child: Center(
+                    child: const Center(
                           child: Text(
                             '19',
                             style: TextStyle(
@@ -210,8 +208,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
             ],
           ),
-        );
-      },
     );
   }
 }
