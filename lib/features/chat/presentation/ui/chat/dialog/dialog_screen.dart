@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_strings.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../domain/entity/message_entity.dart';
 import '../../../../../../features/user/domain/entity/user_entity.dart';
 import '../../../../domain/entity/chat_entity.dart';
 import '../shared_widgets/message_input.dart';
-import '../user_profile_screen.dart';
-import '../group_profile_screen.dart';
 import 'package:exchats/core/widgets/appbar_icon_button.dart';
-import 'package:exchats/core/widgets/rounded_avatar.dart';
-import '../../../../../../features/call/presentation/ui/call/active_call_screen.dart';
 import '../../../../../../core/di/locator.dart';
 import '../../../../../../features/auth/presentation/store/auth_store.dart';
 import '../../../store/message_store.dart';
 import '../../../store/chat_store.dart';
-import '../../../../../../features/user/presentation/store/user_store.dart';
 import '../../../../../../features/user/domain/usecase/user_usecase.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:exchats/core/util/last_seen_formatter.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 
 import 'widgets/message_bubble.dart';
 import 'widgets/message_selection_bar.dart';
@@ -41,7 +39,7 @@ class DialogArguments {
 
 class DialogScreen extends StatefulWidget {
   final String chatId;
-  
+
   const DialogScreen({
     Key? key,
     required this.chatId,
@@ -64,8 +62,7 @@ class _DialogScreenState extends State<DialogScreen>
   late final MessageStore _messageStore;
   late final ChatStore _chatStore;
   late final AuthStore _authStore;
-  late final UserStore _userStore;
-  
+
   ChatEntity? _currentChat;
   UserEntity? _otherUser;
 
@@ -76,23 +73,20 @@ class _DialogScreenState extends State<DialogScreen>
     _messageStore = locator<MessageStore>();
     _chatStore = locator<ChatStore>();
     _authStore = locator<AuthStore>();
-    _userStore = locator<UserStore>();
-    
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
 
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       _loadChatInfo();
 
       _messageStore.watchMessages(widget.chatId);
     });
   }
-  
+
   Future<void> _loadChatInfo() async {
     final chat = await _chatStore.getChatById(widget.chatId);
     if (chat != null) {
       setState(() {
         _currentChat = chat;
       });
-      
 
       if (chat.type == 'dialog') {
         final currentUserId = _authStore.currentUserId ?? '';
@@ -107,9 +101,7 @@ class _DialogScreenState extends State<DialogScreen>
             setState(() {
               _otherUser = user;
             });
-          } catch (e) {
-
-          }
+          } catch (e) {}
         }
       }
     }
@@ -138,15 +130,12 @@ class _DialogScreenState extends State<DialogScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-
-
-
     return Scaffold(
-          appBar: _isSelectionMode 
-              ? _buildSelectionAppBar(theme) 
-              : (_currentChat?.type == 'group' 
-                  ? _buildGroupAppBar(theme) 
-                  : _buildDialogAppBar(theme)),
+      appBar: _isSelectionMode
+          ? _buildSelectionAppBar(theme)
+          : (_currentChat?.type == 'group'
+              ? _buildGroupAppBar(theme)
+              : _buildDialogAppBar(theme)),
       body: Stack(
         children: <Widget>[
           Container(
@@ -169,21 +158,9 @@ class _DialogScreenState extends State<DialogScreen>
                         _isSelectionMode = false;
                         _selectedMessageIds.clear();
                       });
-
-
-
-
-
-
-
-
-
-
-
                     }
                   },
                   onForward: () {
-
                     _exitSelectionMode();
                   },
                   onCopy: () {
@@ -258,12 +235,21 @@ class _DialogScreenState extends State<DialogScreen>
   }
 
   PreferredSizeWidget _buildDialogAppBar(ThemeData theme) {
-    final userName = _otherUser != null 
-        ? '${_otherUser!.firstName} ${_otherUser!.lastName}'.trim()
+    final userName = _otherUser != null
+        ? (_otherUser!.name.isNotEmpty
+            ? _otherUser!.name
+            : (_otherUser!.username.isNotEmpty
+                ? '@${_otherUser!.username}'
+                : 'Пользователь ${_otherUser!.id}'))
         : 'Пользователь';
-    final userStatus = _otherUser?.online == true ? 'В сети' : 'Не в сети';
+    final isOnline = LastSeenFormatter.isOnline(_otherUser?.lastSeenAt);
+    final userStatus = _otherUser == null
+        ? '—'
+        : isOnline
+            ? AppStrings.online
+            : LastSeenFormatter.format(_otherUser!.lastSeenAt);
     final userId = _otherUser?.id ?? '';
-    
+
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -271,13 +257,13 @@ class _DialogScreenState extends State<DialogScreen>
       title: Row(
         children: <Widget>[
           GestureDetector(
-              onTap: () {
-                if (userId.isNotEmpty) {
-                  context.push(
-                    '/user_profile?userId=$userId&userName=${Uri.encodeComponent(userName)}&userStatus=${Uri.encodeComponent(userStatus)}',
-                  );
-                }
-              },
+            onTap: () {
+              if (userId.isNotEmpty) {
+                context.push(
+                  '/user_profile?userId=$userId&userName=${Uri.encodeComponent(userName)}&userStatus=${Uri.encodeComponent(userStatus)}',
+                );
+              }
+            },
             child: Container(
               width: 42.0,
               height: 42.0,
@@ -327,9 +313,7 @@ class _DialogScreenState extends State<DialogScreen>
                       style: TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.normal,
-                        color: _otherUser?.online == true 
-                            ? const Color(0xFF1677FF)
-                            : Colors.grey[600]!,
+                        color: isOnline ? AppColors.primary : Colors.grey[600]!,
                       ),
                     ),
                   ],
@@ -359,7 +343,7 @@ class _DialogScreenState extends State<DialogScreen>
           iconColor: Colors.grey.shade600,
         ),
         Transform.rotate(
-          angle: 1.5708, 
+          angle: 1.5708,
           child: AppBarIconButton(
             onTap: () {},
             icon: Icons.more_vert,
@@ -372,163 +356,164 @@ class _DialogScreenState extends State<DialogScreen>
   }
 
   PreferredSizeWidget _buildGroupAppBar(ThemeData theme) {
-    final groupName = _currentChat != null ? 'Группа ${_currentChat!.id}' : 'Группа';
-    
+    final groupName =
+        _currentChat != null ? 'Группа ${_currentChat!.id}' : 'Группа';
+
     return AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        titleSpacing: 8.0,
-        title: GestureDetector(
-          onTap: () {
-            context.push(
-              '/group_profile?groupId=${widget.chatId}&groupName=${Uri.encodeComponent(groupName)}',
-            );
-          },
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: 42.0,
-                height: 42.0,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    '#',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
-                    ),
+      backgroundColor: Colors.white,
+      elevation: 0,
+      titleSpacing: 8.0,
+      title: GestureDetector(
+        onTap: () {
+          context.push(
+            '/group_profile?groupId=${widget.chatId}&groupName=${Uri.encodeComponent(groupName)}',
+          );
+        },
+        child: Row(
+          children: <Widget>[
+            Container(
+              width: 42.0,
+              height: 42.0,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  '#',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[700],
                   ),
                 ),
               ),
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.only(left: 12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        groupName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const Text(
-                        'Группа',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.normal,
-                          color: Color(0xFF1677FF),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        leading: AppBarIconButton(
-          icon: Icons.arrow_back,
-          iconColor: Colors.black87,
-          onTap: () => context.pop(),
-        ),
-        actions: <Widget>[
-          AppBarIconButton(
-            onTap: () {},
-            icon: Icons.phone,
-            iconSize: 24.0,
-            iconColor: Colors.grey.shade600,
-          ),
-          PopupMenuButton<String>(
-            icon: Transform.rotate(
-              angle: 1.5708, 
-              child: Icon(Icons.more_vert, color: Colors.grey.shade600, size: 24.0),
             ),
-            onSelected: (value) {
-              if (value == 'video_call') {
-              } else if (value == 'search') {
-              } else if (value == 'disable_notifications') {
-              } else if (value == 'leave_group') {
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'video_call',
-                child: Row(
-                  children: [
-                    Icon(Icons.videocam, color: Colors.grey[700], size: 20.0),
-                    const SizedBox(width: 12.0),
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.only(left: 12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
                     Text(
-                      'Видеозвонок',
-                      style: TextStyle(color: Colors.grey[700]),
+                      groupName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const Text(
+                      'Группа',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ],
                 ),
               ),
-              PopupMenuItem(
-                value: 'search',
-                child: Row(
-                  children: [
-                    Icon(Icons.search, color: Colors.grey[700], size: 20.0),
-                    const SizedBox(width: 12.0),
-                    Text(
-                      'Поиск',
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'disable_notifications',
-                child: Row(
-                  children: [
-                    Icon(Icons.notifications_off, color: Colors.grey[700], size: 20.0),
-                    const SizedBox(width: 12.0),
-                    Text(
-                      'Отключить уведомления',
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'leave_group',
-                child: Row(
-                  children: [
-                    Icon(Icons.exit_to_app, color: Colors.red, size: 20.0),
-                    const SizedBox(width: 12.0),
-                    Text(
-                      'Выйти из группы',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
+          ],
+        ),
+      ),
+      automaticallyImplyLeading: false,
+      leading: AppBarIconButton(
+        icon: Icons.arrow_back,
+        iconColor: Colors.black87,
+        onTap: () => context.pop(),
+      ),
+      actions: <Widget>[
+        AppBarIconButton(
+          onTap: () {},
+          icon: Icons.phone,
+          iconSize: 24.0,
+          iconColor: Colors.grey.shade600,
+        ),
+        PopupMenuButton<String>(
+          icon: Transform.rotate(
+            angle: 1.5708,
+            child:
+                Icon(Icons.more_vert, color: Colors.grey.shade600, size: 24.0),
           ),
-        ],
+          onSelected: (value) {
+            if (value == 'video_call') {
+            } else if (value == 'search') {
+            } else if (value == 'disable_notifications') {
+            } else if (value == 'leave_group') {}
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'video_call',
+              child: Row(
+                children: [
+                  Icon(Icons.videocam, color: Colors.grey[700], size: 20.0),
+                  const SizedBox(width: 12.0),
+                  Text(
+                    'Видеозвонок',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'search',
+              child: Row(
+                children: [
+                  Icon(Icons.search, color: Colors.grey[700], size: 20.0),
+                  const SizedBox(width: 12.0),
+                  Text(
+                    'Поиск',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'disable_notifications',
+              child: Row(
+                children: [
+                  Icon(Icons.notifications_off,
+                      color: Colors.grey[700], size: 20.0),
+                  const SizedBox(width: 12.0),
+                  Text(
+                    'Отключить уведомления',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'leave_group',
+              child: Row(
+                children: [
+                  Icon(Icons.exit_to_app, color: Colors.red, size: 20.0),
+                  const SizedBox(width: 12.0),
+                  Text(
+                    'Выйти из группы',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-
   Widget _buildMessageList() {
     final currentUserId = _authStore.currentUserId ?? '';
-    
+
     return Observer(
       builder: (_) {
         final messages = _messageStore.messages.toList();
 
         messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-        
+
         _messagesMap.clear();
         for (var msg in messages) {
           _messagesMap[msg.id] = msg;
@@ -540,12 +525,12 @@ class _DialogScreenState extends State<DialogScreen>
             thickness: 4.0,
             child: ListView.builder(
               key: _messagesListKey,
-              controller: ScrollController(), 
+              controller: ScrollController(),
               itemCount: messages.length + 1,
               reverse: true,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  final isDialog = true; 
+                  final isDialog = true;
                   UserEntity? typingUser;
                   if (!isDialog && messages.isNotEmpty) {
                     final lastMessage = messages.first;
@@ -565,7 +550,10 @@ class _DialogScreenState extends State<DialogScreen>
                     index < messages.length - 1 ? messages[index + 1] : null;
                 final showAvatar = previousMessage == null ||
                     previousMessage.owner != message.owner ||
-                    message.createdAt.difference(previousMessage.createdAt).inMinutes > 5;
+                    message.createdAt
+                            .difference(previousMessage.createdAt)
+                            .inMinutes >
+                        5;
 
                 MessageEntity? replyToMsg;
                 UserEntity? replyToUser;
@@ -573,34 +561,15 @@ class _DialogScreenState extends State<DialogScreen>
                   replyToMsg = _messagesMap[message.replyTo];
                   if (replyToMsg != null) {
                     replyToUser = _usersMap[replyToMsg.owner];
-                    if (replyToUser == null) {
-
-
-
-
-
-
-
-
-                    }
+                    if (replyToUser == null) {}
                   }
                 }
 
                 UserEntity? messageUser = _usersMap[message.owner];
 
-
-
-
-
-
-
-
-
-
-
-                final isDialog = true; 
+                final isDialog = true;
                 final shouldShowAvatar = isDialog ? false : !isOwnMessage;
-                
+
                 return MessageBubble(
                   message: message,
                   replyToMessage: replyToMsg,
@@ -629,17 +598,6 @@ class _DialogScreenState extends State<DialogScreen>
                     setState(() {
                       _replyToMessage = message;
                       _replyToUser = messageUser;
-
-
-
-
-
-
-
-
-
-
-
                     });
                   },
                 );
@@ -676,8 +634,7 @@ class _DialogScreenState extends State<DialogScreen>
     _exitSelectionMode();
   }
 
-  void _showMessageContextMenu(
-      BuildContext context, MessageEntity message) {
+  void _showMessageContextMenu(BuildContext context, MessageEntity message) {
     MessageContextMenu.show(
       context,
       message,
@@ -708,8 +665,7 @@ class _DialogScreenState extends State<DialogScreen>
         );
         if (result != null && mounted) {
           if (result) {
-          } else {
-          }
+          } else {}
         }
       },
     );

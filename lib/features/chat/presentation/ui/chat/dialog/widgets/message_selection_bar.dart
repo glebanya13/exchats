@@ -20,8 +20,6 @@ class MessageSelectionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
       decoration: BoxDecoration(
@@ -37,7 +35,6 @@ class MessageSelectionBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-
           InkWell(
             onTap: onReply,
             child: Row(
@@ -59,7 +56,6 @@ class MessageSelectionBar extends StatelessWidget {
               ],
             ),
           ),
-
           InkWell(
             onTap: onForward,
             child: Row(
@@ -86,4 +82,3 @@ class MessageSelectionBar extends StatelessWidget {
     );
   }
 }
-

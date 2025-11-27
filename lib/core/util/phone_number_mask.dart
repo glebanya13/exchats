@@ -7,7 +7,8 @@ class PhoneNumberMask {
     required String text,
     required String mask,
   }) {
-    return _applyMask(text, mask);
+    final digitsOnly = text.replaceAll(RegExp(r'[^0-9+]'), '');
+    return _applyMask(digitsOnly, mask);
   }
 
   static String _applyMask(String text, String mask) {

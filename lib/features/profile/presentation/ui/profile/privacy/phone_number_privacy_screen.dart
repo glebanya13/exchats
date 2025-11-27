@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 
 class PhoneNumberPrivacyScreen extends StatefulWidget {
   const PhoneNumberPrivacyScreen({Key? key}) : super(key: key);
 
   @override
-  _PhoneNumberPrivacyScreenState createState() => _PhoneNumberPrivacyScreenState();
+  _PhoneNumberPrivacyScreenState createState() =>
+      _PhoneNumberPrivacyScreenState();
 }
 
 class _PhoneNumberPrivacyScreenState extends State<PhoneNumberPrivacyScreen> {
@@ -150,7 +151,8 @@ class _PhoneNumberPrivacyScreenState extends State<PhoneNumberPrivacyScreen> {
         InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               children: [
                 SizedBox(
@@ -158,7 +160,7 @@ class _PhoneNumberPrivacyScreenState extends State<PhoneNumberPrivacyScreen> {
                   child: isSelected
                       ? Icon(
                           Icons.check,
-                          color: const Color(0xFF1677FF),
+                          color: AppColors.primary,
                           size: 20.0,
                         )
                       : null,
@@ -232,4 +234,3 @@ class _PhoneNumberPrivacyScreenState extends State<PhoneNumberPrivacyScreen> {
     );
   }
 }
-

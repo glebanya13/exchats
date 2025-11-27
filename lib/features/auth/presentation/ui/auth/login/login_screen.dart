@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:country_picker/country_picker.dart';
+import 'package:exchats/core/di/locator.dart';
+import 'package:exchats/core/constants/app_colors.dart';
+import 'package:exchats/features/auth/presentation/store/auth_store.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -11,13 +15,21 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  int _selectedTab = 0; 
+  int _selectedTab = 0;
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   bool _isPhoneValid = false;
   bool _isEmailValid = false;
   String? _phoneError;
   String? _emailError;
+  bool _isSendingCode = false;
+  late Country _selectedCountry;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCountry = CountryParser.parseCountryCode('RU');
+  }
 
   @override
   void dispose() {
@@ -31,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -52,7 +64,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
                   Image.asset(
                     'assets/auth/logo.png',
                     width: 64.0,
@@ -70,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 24.0),
-
                   Text(
                     'Авторизация',
                     style: TextStyle(
@@ -80,10 +90,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 32.0),
-
                   _buildTabs(theme),
                   const SizedBox(height: 24.0),
-
                   _selectedTab == 0
                       ? _buildPhoneInput(theme)
                       : _buildEmailInput(theme),
@@ -103,10 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   const SizedBox(height: 24.0),
-
                   _buildNextButton(theme),
                   const SizedBox(height: 24.0),
-
                   _buildSocialLogin(theme),
                 ],
               ),
@@ -121,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       height: 44.0,
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Row(
@@ -200,12 +206,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildPhoneInput(ThemeData theme) {
+    final dialCode = '+${_selectedCountry.phoneCode}';
     return TextField(
       controller: _phoneController,
       keyboardType: TextInputType.phone,
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(11),
+        LengthLimitingTextInputFormatter(15),
       ],
       style: TextStyle(
         fontSize: 16.0,
@@ -213,34 +220,32 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       decoration: InputDecoration(
         hintText: '',
-        prefixIcon: Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/auth/russian-federation.png',
-                width: 20.0,
-                height: 20.0,
-                errorBuilder: (context, error, stackTrace) {
-                  return Text(
-                    '🇷🇺',
-                    style: TextStyle(fontSize: 20.0),
-                  );
-                },
-              ),
-              const SizedBox(width: 8.0),
-              Text(
-                '+7',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.black,
+        prefixIcon: InkWell(
+          borderRadius: BorderRadius.circular(8.0),
+          onTap: _openCountryPicker,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _selectedCountry.flagEmoji,
+                  style: const TextStyle(fontSize: 20.0),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8.0),
+                Text(
+                  dialCode,
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.black,
+                  ),
+                ),
+                const Icon(Icons.keyboard_arrow_down_rounded, size: 18.0),
+              ],
+            ),
           ),
         ),
-        prefixIconConstraints: BoxConstraints(minWidth: 80.0),
+        prefixIconConstraints: const BoxConstraints(minWidth: 110.0),
         suffixIcon: _phoneController.text.isNotEmpty
             ? (_isPhoneValid && _phoneError == null
                 ? Padding(
@@ -270,7 +275,8 @@ class _LoginScreenState extends State<LoginScreen> {
             : null,
         filled: true,
         fillColor: const Color(0xFFF0F1F3),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide.none,
@@ -285,7 +291,8 @@ class _LoginScreenState extends State<LoginScreen> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide(
-            color: _phoneError != null ? Colors.red : theme.colorScheme.secondary,
+            color:
+                _phoneError != null ? Colors.red : theme.colorScheme.secondary,
             width: 2.0,
           ),
         ),
@@ -300,14 +307,29 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       onChanged: (value) {
         setState(() {
-          _isPhoneValid = value.length == 11;
-          if (value.length > 0 && value.length < 11) {
-            _phoneError = 'Номер телефона заблокирован';
-          } else if (value.length == 11) {
-            _phoneError = null;
-          } else {
-            _phoneError = null;
-          }
+          final digits = value.trim();
+          _isPhoneValid = digits.length >= 5 && digits.length <= 15;
+          _phoneError = null;
+        });
+      },
+    );
+  }
+
+  void _openCountryPicker() {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      favorite: const ['RU', 'UA', 'KZ', 'BY'],
+      countryListTheme: CountryListThemeData(
+        borderRadius: BorderRadius.circular(12),
+        inputDecoration: const InputDecoration(
+          hintText: 'Поиск страны',
+          prefixIcon: Icon(Icons.search),
+        ),
+      ),
+      onSelect: (country) {
+        setState(() {
+          _selectedCountry = country;
         });
       },
     );
@@ -329,7 +351,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         filled: true,
         fillColor: const Color(0xFFF0F1F3),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide.none,
@@ -344,7 +367,8 @@ class _LoginScreenState extends State<LoginScreen> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide(
-            color: _emailError != null ? Colors.red : theme.colorScheme.secondary,
+            color:
+                _emailError != null ? Colors.red : theme.colorScheme.secondary,
             width: 2.0,
           ),
         ),
@@ -378,34 +402,70 @@ class _LoginScreenState extends State<LoginScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: (isValid && !hasError)
-            ? () {
+        onPressed: (isValid && !hasError && !_isSendingCode)
+            ? () async {
                 if (_selectedTab == 0) {
-                  final phoneNumber = '+7${_phoneController.text}';
-                  context.push('/auth/verification?phoneNumber=$phoneNumber');
-                } else {
-
+                  final digits = _phoneController.text.trim();
+                  final phoneNumber = '+${_selectedCountry.phoneCode}$digits';
+                  setState(() {
+                    _isSendingCode = true;
+                    _phoneError = null;
+                  });
+                  try {
+                    final authStore = locator<AuthStore>();
+                    await authStore.sendVerificationCode(phoneNumber);
+                    if (!mounted) return;
+                    context.push('/auth/verification?phoneNumber=$phoneNumber');
+                  } catch (e) {
+                    if (!mounted) return;
+                    setState(() {
+                      _phoneError =
+                          'Не удалось отправить код. Попробуйте позже.';
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text('Ошибка отправки кода. Повторите попытку.'),
+                      ),
+                    );
+                  } finally {
+                    if (mounted) {
+                      setState(() {
+                        _isSendingCode = false;
+                      });
+                    }
+                  }
                 }
               }
             : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: isValid && !hasError
-              ? const Color(0xFF1677FF)
+              ? AppColors.primary
               : const Color(0xFFF0F1F3),
-          foregroundColor: isValid && !hasError ? Colors.white : Colors.grey[600],
+          foregroundColor:
+              isValid && !hasError ? Colors.white : Colors.grey[600],
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
           elevation: 0,
         ),
-        child: Text(
-          'Далее',
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        child: _isSendingCode
+            ? const SizedBox(
+                height: 20.0,
+                width: 20.0,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.0,
+                  color: Colors.white,
+                ),
+              )
+            : Text(
+                'Далее',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
       ),
     );
   }
@@ -435,7 +495,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSocialButton(String assetPath, bool isTelegram, VoidCallback onTap) {
+  Widget _buildSocialButton(
+      String assetPath, bool isTelegram, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -471,5 +532,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
 }

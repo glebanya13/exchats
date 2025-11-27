@@ -52,7 +52,6 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16.0),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -90,7 +89,8 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                       if (_hasPassword) {
                         await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const PasswordSettingsScreen(),
+                            builder: (context) =>
+                                const PasswordSettingsScreen(),
                           ),
                         );
                         _checkPasswordStatus();
@@ -108,7 +108,6 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
               ),
             ),
             const SizedBox(height: 32.0),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -131,7 +130,8 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const PhoneNumberPrivacyScreen(),
+                          builder: (context) =>
+                              const PhoneNumberPrivacyScreen(),
                         ),
                       );
                     },
@@ -155,7 +155,8 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const ProfilePhotosPrivacyScreen(),
+                          builder: (context) =>
+                              const ProfilePhotosPrivacyScreen(),
                         ),
                       );
                     },
@@ -191,7 +192,8 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const VoiceMessagesPrivacyScreen(),
+                          builder: (context) =>
+                              const VoiceMessagesPrivacyScreen(),
                         ),
                       );
                     },
@@ -315,4 +317,3 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
     );
   }
 }
-

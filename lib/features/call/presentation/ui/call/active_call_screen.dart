@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
-import 'package:exchats/core/widgets/rounded_avatar.dart';
 import 'widgets/connection_request_dialog.dart';
 
 class ActiveCallScreen extends StatefulWidget {
@@ -88,11 +87,8 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
       backgroundColor: Colors.grey[200],
       body: Stack(
         children: [
-
           _buildVideoBackground(userName, theme),
-
           if (_showParticipants) _buildParticipantsList(theme),
-
           _buildBottomControls(theme),
         ],
       ),
@@ -101,7 +97,6 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
 
   Widget _buildVideoBackground(String userName, ThemeData theme) {
     if (widget.isVideoCall && _isVideoEnabled) {
-
       return Container(
         width: double.infinity,
         height: double.infinity,
@@ -143,7 +138,6 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
         ),
       );
     } else {
-
       return Container(
         width: double.infinity,
         height: double.infinity,
@@ -184,7 +178,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
               Text(
                 _callStatus,
                 style: const TextStyle(
-                  color: Color(0xFF1677FF),
+                  color: AppColors.primary,
                   fontSize: 16.0,
                 ),
               ),
@@ -207,7 +201,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
                     Text(
                       'Добавить пользователей',
                       style: const TextStyle(
-                        color: Color(0xFF1677FF),
+                        color: AppColors.primary,
                         fontSize: 16.0,
                         fontWeight: FontWeight.w500,
                       ),
@@ -268,7 +262,6 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
           itemCount: participants.length + 1,
           itemBuilder: (context, index) {
             if (index == 0) {
-
               return Container(
                 margin: const EdgeInsets.only(bottom: 8.0),
                 decoration: BoxDecoration(
@@ -285,9 +278,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () {
-
-                    },
+                    onTap: () {},
                     borderRadius: BorderRadius.circular(8.0),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -302,7 +293,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
                           Text(
                             'Добавить пользователя',
                             style: const TextStyle(
-                              color: Color(0xFF1677FF),
+                              color: AppColors.primary,
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                             ),
@@ -314,7 +305,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
                 ),
               );
             }
-            
+
             final participant = participants[index - 1];
             return Container(
               margin: EdgeInsets.only(
@@ -334,9 +325,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () {
-
-                  },
+                  onTap: () {},
                   borderRadius: BorderRadius.circular(8.0),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -395,8 +384,8 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
       left: 0,
       right: 0,
       child: SafeArea(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
           decoration: BoxDecoration(
             color: Colors.grey[200],
             borderRadius: const BorderRadius.only(
@@ -421,7 +410,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
               _buildControlButton(
                 icon: Icons.cast,
                 isActive: _isScreenSharing,
-                backgroundColor: const Color(0xFF1677FF),
+                backgroundColor: AppColors.primary,
                 iconColor: Colors.white,
                 onTap: () {
                   setState(() {
@@ -432,7 +421,7 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
               _buildControlButton(
                 icon: _isMuted ? Icons.mic_off : Icons.mic,
                 isActive: _isMuted,
-                backgroundColor: _isMuted ? Colors.white : const Color(0xFF1677FF),
+                backgroundColor: _isMuted ? Colors.white : AppColors.primary,
                 iconColor: _isMuted ? Colors.black87 : Colors.white,
                 onTap: () {
                   setState(() {
@@ -455,9 +444,9 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
                 icon: Icons.call_end,
                 backgroundColor: Colors.red,
                 iconColor: Colors.white,
-                  onTap: () {
-                    context.pop();
-                  },
+                onTap: () {
+                  context.pop();
+                },
               ),
             ],
           ),
@@ -491,4 +480,3 @@ class _ActiveCallScreenState extends State<ActiveCallScreen> {
     );
   }
 }
-

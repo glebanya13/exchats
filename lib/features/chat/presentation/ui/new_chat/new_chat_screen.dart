@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class NewChatScreen extends StatefulWidget {
@@ -11,7 +12,7 @@ class NewChatScreen extends StatefulWidget {
 class _NewChatScreenState extends State<NewChatScreen> {
   final TextEditingController _searchController = TextEditingController();
   final Set<String> _selectedContacts = {};
-  
+
   final List<Map<String, dynamic>> _contacts = [
     {'name': 'Артём', 'avatarColor': Colors.purple},
     {'name': 'Елена', 'avatarColor': Colors.pink},
@@ -20,7 +21,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
     {'name': 'Иван', 'avatarColor': Colors.blue},
     {'name': 'София', 'avatarColor': Colors.purple},
   ];
-  
+
   List<Map<String, dynamic>> _filteredContacts = [];
 
   @override
@@ -62,7 +63,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -84,7 +85,8 @@ class _NewChatScreenState extends State<NewChatScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8.0),
@@ -121,7 +123,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
                 final name = contact['name'] as String;
                 final avatarColor = contact['avatarColor'] as Color;
                 final isSelected = _selectedContacts.contains(name);
-                
+
                 return Container(
                   margin: const EdgeInsets.only(bottom: 8.0),
                   decoration: BoxDecoration(
@@ -132,7 +134,8 @@ class _NewChatScreenState extends State<NewChatScreen> {
                     onTap: () => _toggleContact(name),
                     borderRadius: BorderRadius.circular(8.0),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 12.0),
                       child: Row(
                         children: [
                           Container(
@@ -140,11 +143,15 @@ class _NewChatScreenState extends State<NewChatScreen> {
                             height: 20.0,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: isSelected ? const Color(0xFF1677FF) : Colors.grey[400]!,
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : Colors.grey[400]!,
                                 width: 2.0,
                               ),
                               borderRadius: BorderRadius.circular(4.0),
-                              color: isSelected ? const Color(0xFF1677FF) : Colors.transparent,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : Colors.transparent,
                             ),
                             child: isSelected
                                 ? Icon(
@@ -208,7 +215,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
                     ),
                   );
                 },
-                backgroundColor: const Color(0xFF1677FF),
+                backgroundColor: AppColors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -238,7 +245,7 @@ class CreateGroupScreen extends StatefulWidget {
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final TextEditingController _groupNameController = TextEditingController();
-  
+
   final Map<String, Color> _contactColors = {
     'Артём': Colors.purple,
     'Елена': Colors.pink,
@@ -263,7 +270,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -300,7 +307,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   ),
                   const SizedBox(height: 8.0),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF0F1F3),
                       borderRadius: BorderRadius.circular(8.0),
@@ -341,7 +349,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   final avatarColor = _contactColors[name] ?? Colors.purple;
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8.0),
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8.0),
@@ -391,9 +400,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         width: 48.0,
         height: 48.0,
         child: FloatingActionButton(
-          onPressed: () {
-          },
-          backgroundColor: const Color(0xFF1677FF),
+          onPressed: () {},
+          backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),

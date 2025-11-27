@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:exchats/core/widgets/appbar_icon_button.dart';
+import 'package:exchats/core/constants/app_colors.dart';
+import 'package:exchats/core/constants/app_strings.dart';
 
 class ArchiveScreen extends StatelessWidget {
   const ArchiveScreen({Key? key}) : super(key: key);
@@ -8,19 +10,19 @@ class ArchiveScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: AppBarIconButton(
           icon: Icons.arrow_back,
-          iconColor: Colors.black87,
+          iconColor: AppColors.black,
           onTap: () => context.pop(),
         ),
         title: const Text(
           'Архив',
           style: TextStyle(
-            color: Colors.black87,
+            color: AppColors.black,
             fontSize: 17.0,
             fontWeight: FontWeight.w500,
           ),
@@ -28,9 +30,9 @@ class ArchiveScreen extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'Архив пуст',
+          AppStrings.archiveEmpty,
           style: TextStyle(
-            color: Colors.grey[600],
+            color: AppColors.grey(600),
             fontSize: 16.0,
           ),
         ),

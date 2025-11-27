@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:exchats/core/widgets/appbar_icon_button.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -40,7 +39,6 @@ class _CustomAppBarState extends State<CustomAppBar>
             setState(() {
               _isSearching = false;
               _searchController.clear();
-
             });
           } else {
             Navigator.of(context).pop();
@@ -49,16 +47,16 @@ class _CustomAppBarState extends State<CustomAppBar>
       ),
       actions: <Widget>[
         if (!_isSearching)
-        AppBarIconButton(
+          AppBarIconButton(
             onTap: () {
               setState(() {
                 _isSearching = true;
               });
             },
-          icon: Icons.search,
-          iconSize: 24,
-          iconColor: Theme.of(context).textTheme.displayLarge!.color!,
-        ),
+            icon: Icons.search,
+            iconSize: 24,
+            iconColor: Theme.of(context).textTheme.displayLarge!.color!,
+          ),
       ],
     );
   }
@@ -86,9 +84,7 @@ class _CustomAppBarState extends State<CustomAppBar>
         ),
         border: InputBorder.none,
       ),
-      onChanged: (value) {
-
-      },
+      onChanged: (value) {},
     );
   }
 }

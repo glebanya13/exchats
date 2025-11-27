@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_strings.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:exchats/core/widgets/appbar_icon_button.dart';
@@ -56,7 +58,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         actions: [
           AppBarIconButton(
             icon: Icons.edit,
-            iconColor: const Color(0xFF62697B),
+            iconColor: AppColors.iconGray,
             onTap: () {},
           ),
         ],
@@ -64,12 +66,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             Padding(
               padding: const EdgeInsets.only(top: 24.0, bottom: 32.0),
               child: Column(
                 children: [
-
                   Container(
                     width: 96.0,
                     height: 96.0,
@@ -90,7 +90,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     ),
                   ),
                   const SizedBox(height: 16.0),
-
                   Text(
                     widget.userName,
                     style: const TextStyle(
@@ -100,17 +99,15 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     ),
                   ),
                   const SizedBox(height: 8.0),
-
                   Text(
-                    widget.userStatus ?? 'В сети',
+                    widget.userStatus ?? AppStrings.online,
                     style: const TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.normal,
-                      color: Color(0xFF1677FF),
+                      color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(height: 24.0),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Row(
@@ -148,7 +145,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
@@ -156,7 +152,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   _buildDetailCard(
                     label: 'Телефон',
                     value: '+7 (909) 844-12-23',
-                    valueColor: const Color(0xFF1677FF),
+                    valueColor: AppColors.primary,
                   ),
                   const SizedBox(height: 8.0),
                   _buildDetailCard(
@@ -169,19 +165,18 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   _buildDetailCard(
                     label: 'Имя пользователя',
                     value: '@Art_26',
-                    valueColor: const Color(0xFF1677FF),
+                    valueColor: AppColors.primary,
                   ),
                   const SizedBox(height: 8.0),
                   _buildDetailCard(
                     label: 'Почта',
                     value: 'qwerty@mail.ru',
-                    valueColor: const Color(0xFF1677FF),
+                    valueColor: AppColors.primary,
                   ),
                   const SizedBox(height: 24.0),
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
@@ -193,7 +188,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 16.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -205,7 +201,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                         ],
                       ),
                     ),
-
                     IndexedStack(
                       index: _selectedTabIndex,
                       children: [
@@ -236,13 +231,14 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           onTap: () {},
           borderRadius: BorderRadius.circular(8.0),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   icon,
-                  color: const Color(0xFF1677FF),
+                  color: AppColors.primary,
                   size: 24.0,
                 ),
                 const SizedBox(height: 4.0),
@@ -251,7 +247,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   style: const TextStyle(
                     fontSize: 12.0,
                     fontWeight: FontWeight.normal,
-                    color: Color(0xFF1677FF),
+                    color: AppColors.primary,
                   ),
                 ),
               ],
@@ -317,7 +313,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             style: TextStyle(
               fontSize: 16.0,
               fontWeight: FontWeight.w500,
-              color: isSelected ? const Color(0xFF1677FF) : Colors.grey[600],
+              color: isSelected ? AppColors.primary : Colors.grey[600],
             ),
           ),
           const SizedBox(height: 8.0),
@@ -325,7 +321,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             width: 50.0,
             height: 2.0,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF1677FF) : Colors.transparent,
+              color: isSelected ? AppColors.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(1.0),
             ),
           ),
@@ -473,7 +469,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       style: const TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.normal,
-                        color: Color(0xFF1677FF),
+                        color: AppColors.primary,
                       ),
                     ),
                   ],
@@ -486,4 +482,3 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     );
   }
 }
-

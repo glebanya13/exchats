@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../domain/entity/chat_entity.dart';
 import '../../../../domain/entity/message_entity.dart';
 import '../../../../../../core/di/locator.dart';
+import '../../../../../../core/constants/app_colors.dart';
 import '../../../store/chat_store.dart';
-import '../../../../../../features/user/presentation/store/user_store.dart';
 import '../../../../../../features/auth/presentation/store/auth_store.dart';
 import 'package:intl/intl.dart';
 
@@ -19,15 +19,13 @@ class ChatListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final chatStore = locator<ChatStore>();
     final authStore = locator<AuthStore>();
     final currentUserId = authStore.currentUserId ?? '';
-    
-    final isSavedMessages = chat.type == 'saved_messages';
+
     final isDialog = chat.type == 'dialog';
     final isGroup = chat.type == 'group';
-    
+
     String? otherUserId;
     if (isDialog) {
       otherUserId = chat.users.firstWhere(
@@ -35,7 +33,7 @@ class ChatListItem extends StatelessWidget {
         orElse: () => '',
       );
     }
-    
+
     return InkWell(
       onTap: () {
         context.push('/chat/${chat.id}');
@@ -49,9 +47,8 @@ class ChatListItem extends StatelessWidget {
               width: 56.0,
               height: 56.0,
               decoration: BoxDecoration(
-                color: isGroup 
-                    ? Colors.grey[300] 
-                    : Colors.purple.withOpacity(0.3),
+                color:
+                    isGroup ? Colors.grey[300] : Colors.purple.withOpacity(0.3),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -113,7 +110,8 @@ class ChatListItem extends StatelessWidget {
                       Observer(
                         builder: (_) {
                           final lastMessage = chatStore.lastMessages[chat.id];
-                          final unreadCount = _getUnreadCount(chat, lastMessage);
+                          final unreadCount =
+                              _getUnreadCount(chat, lastMessage);
                           if (unreadCount > 0) {
                             return Container(
                               padding: const EdgeInsets.symmetric(
@@ -121,7 +119,7 @@ class ChatListItem extends StatelessWidget {
                                 vertical: 2.0,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1677FF),
+                                color: AppColors.primary,
                                 shape: BoxShape.circle,
                               ),
                               constraints: const BoxConstraints(

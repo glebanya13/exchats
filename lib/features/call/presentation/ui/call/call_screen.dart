@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:exchats/core/widgets/appbar_icon_button.dart';
-import 'package:exchats/core/widgets/rounded_avatar.dart';
 
 import 'strings.dart';
 import 'active_call_screen.dart';
-import 'widgets/connection_request_dialog.dart';
 
 class CallScreen extends StatefulWidget {
   final String? userId;
@@ -33,12 +32,9 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final userName = widget.userName ?? 'Unknown';
 
-
     if (!widget.isIncoming) {
-
       Future.delayed(Duration(seconds: 1), () {
         if (mounted) {
           context.go(
@@ -108,7 +104,7 @@ class _CallScreenState extends State<CallScreen> {
                           ? CallStrings.kIncomingCall
                           : CallStrings.kCalling,
                       style: const TextStyle(
-                        color: Color(0xFF1677FF),
+                        color: AppColors.primary,
                         fontSize: 16.0,
                       ),
                     ),
@@ -121,7 +117,8 @@ class _CallScreenState extends State<CallScreen> {
                           );
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 12.0),
                           decoration: BoxDecoration(
                             color: Colors.transparent,
                             borderRadius: BorderRadius.circular(12.0),
@@ -131,14 +128,14 @@ class _CallScreenState extends State<CallScreen> {
                             children: [
                               Icon(
                                 Icons.person_add,
-                                color: const Color(0xFF1677FF),
+                                color: AppColors.primary,
                                 size: 20.0,
                               ),
                               const SizedBox(width: 8.0),
                               Text(
                                 'Добавить пользователей',
                                 style: const TextStyle(
-                                  color: Color(0xFF1677FF),
+                                  color: AppColors.primary,
                                   fontSize: 14.0,
                                 ),
                               ),
@@ -151,7 +148,6 @@ class _CallScreenState extends State<CallScreen> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(32.0),
               child: Row(
@@ -238,13 +234,13 @@ class _CallScreenState extends State<CallScreen> {
         ),
         child: Icon(
           icon,
-          color: backgroundColor == Colors.red || backgroundColor == Colors.green
-              ? Colors.white
-              : Colors.black87,
+          color:
+              backgroundColor == Colors.red || backgroundColor == Colors.green
+                  ? Colors.white
+                  : Colors.black87,
           size: 24.0,
         ),
       ),
     );
   }
 }
-

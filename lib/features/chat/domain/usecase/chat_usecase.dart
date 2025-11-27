@@ -28,7 +28,8 @@ class ChatUseCase {
     return _chatRepository.sendMessage(chatId, message);
   }
 
-  Future<MessageEntity> updateMessage(String chatId, String messageId, MessageEntity message) {
+  Future<MessageEntity> updateMessage(
+      String chatId, String messageId, MessageEntity message) {
     return _chatRepository.updateMessage(chatId, messageId, message);
   }
 
@@ -44,4 +45,3 @@ class ChatUseCase {
     return _chatRepository.watchChatMessages(chatId);
   }
 }
-

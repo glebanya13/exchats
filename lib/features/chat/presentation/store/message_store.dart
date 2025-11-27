@@ -26,11 +26,11 @@ abstract class _MessageStore with Store {
   @action
   void watchMessages(String chatId) {
     _messagesSubscription?.cancel();
-    _messagesSubscription = _chatUseCase.watchChatMessages(chatId).listen((messages) {
+    _messagesSubscription =
+        _chatUseCase.watchChatMessages(chatId).listen((messages) {
       this.messages.clear();
       this.messages.addAll(messages);
     });
-    
 
     loadMessages(chatId);
   }
@@ -62,9 +62,11 @@ abstract class _MessageStore with Store {
   }
 
   @action
-  Future<void> updateMessage(String chatId, String messageId, MessageEntity message) async {
+  Future<void> updateMessage(
+      String chatId, String messageId, MessageEntity message) async {
     try {
-      final updatedMessage = await _chatUseCase.updateMessage(chatId, messageId, message);
+      final updatedMessage =
+          await _chatUseCase.updateMessage(chatId, messageId, message);
       final index = messages.indexWhere((m) => m.id == messageId);
       if (index != -1) {
         messages[index] = updatedMessage;
@@ -87,7 +89,8 @@ abstract class _MessageStore with Store {
   }
 
   @action
-  Future<void> markMessagesAsRead(String chatId, List<String> messageIds) async {
+  Future<void> markMessagesAsRead(
+      String chatId, List<String> messageIds) async {
     try {
       await _chatUseCase.markMessagesAsRead(chatId, messageIds);
       for (final messageId in messageIds) {
@@ -118,4 +121,3 @@ abstract class _MessageStore with Store {
     _messagesSubscription?.cancel();
   }
 }
-

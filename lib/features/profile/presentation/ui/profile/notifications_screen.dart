@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -15,8 +16,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -32,7 +31,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16.0),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -64,7 +62,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ),
             const SizedBox(height: 32.0),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -193,7 +190,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             child: CupertinoSwitch(
               value: value,
               onChanged: onChanged,
-              activeColor: const Color(0xFF1677FF),
+              activeColor: AppColors.primary,
             ),
           ),
         ],
@@ -201,4 +198,3 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 }
-

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 
 class ForwardingPrivacyScreen extends StatefulWidget {
   const ForwardingPrivacyScreen({Key? key}) : super(key: key);
 
   @override
-  _ForwardingPrivacyScreenState createState() => _ForwardingPrivacyScreenState();
+  _ForwardingPrivacyScreenState createState() =>
+      _ForwardingPrivacyScreenState();
 }
 
 class _ForwardingPrivacyScreenState extends State<ForwardingPrivacyScreen> {
@@ -124,7 +126,8 @@ class _ForwardingPrivacyScreenState extends State<ForwardingPrivacyScreen> {
         InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               children: [
                 SizedBox(
@@ -132,7 +135,7 @@ class _ForwardingPrivacyScreenState extends State<ForwardingPrivacyScreen> {
                   child: isSelected
                       ? Icon(
                           Icons.check,
-                          color: const Color(0xFF1677FF),
+                          color: AppColors.primary,
                           size: 20.0,
                         )
                       : null,
@@ -206,4 +209,3 @@ class _ForwardingPrivacyScreenState extends State<ForwardingPrivacyScreen> {
     );
   }
 }
-

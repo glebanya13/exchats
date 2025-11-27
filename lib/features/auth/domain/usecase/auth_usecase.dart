@@ -6,7 +6,7 @@ class AuthUseCase {
 
   AuthUseCase(this._authRepository);
 
-  Future<String> sendVerificationCode(String phoneNumber) {
+  Future<void> sendVerificationCode(String phoneNumber) {
     return _authRepository.sendVerificationCode(phoneNumber);
   }
 
@@ -24,7 +24,7 @@ class AuthUseCase {
     return _authRepository.logout();
   }
 
-  Future<String?> getCurrentUserId() {
-    return _authRepository.getCurrentUserId();
+  Future<UserEntity?> getCurrentUser() {
+    return _authRepository.getCurrentUser();
   }
 }

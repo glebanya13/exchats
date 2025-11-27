@@ -13,4 +13,3 @@ class ChatEntity {
     required this.users,
   });
 }
-

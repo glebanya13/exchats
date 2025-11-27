@@ -12,7 +12,6 @@ abstract class ApiService {
   Future<UserDto> getUserById(String id);
   Future<UserDto> createUser(UserDto user);
   Future<UserDto> updateUser(String id, UserDto user);
-  Future<void> updateOnlineStatus(String id, bool online);
   Future<List<ChatDto>> getUserChats(String userId);
 
   Future<ChatDto> getChatById(String id);
@@ -20,7 +19,8 @@ abstract class ApiService {
 
   Future<List<MessageDto>> getChatMessages(String chatId);
   Future<MessageDto> sendMessage(String chatId, MessageDto message);
-  Future<MessageDto> updateMessage(String chatId, String messageId, MessageDto message);
+  Future<MessageDto> updateMessage(
+      String chatId, String messageId, MessageDto message);
   Future<void> deleteMessage(String chatId, String messageId);
   Future<void> markMessagesAsRead(String chatId, List<String> messageIds);
 }

@@ -85,4 +85,3 @@ class EnablePasswordScreen extends StatelessWidget {
     );
   }
 }
-

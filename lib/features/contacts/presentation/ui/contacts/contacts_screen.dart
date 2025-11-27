@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_strings.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ContactItem {
@@ -66,8 +68,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         _filteredContacts = _allContacts;
       } else {
         _filteredContacts = _allContacts
-            .where((contact) =>
-                contact.name.toLowerCase().contains(query))
+            .where((contact) => contact.name.toLowerCase().contains(query))
             .toList();
       }
     });
@@ -81,16 +82,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
     final minute = lastSeen.minute.toString().padLeft(2, '0');
     final time = '$hour:$minute';
 
-
     if (difference.inDays == 0) {
       return 'Был(а) в $time';
-    }
-
-    else if (difference.inDays == 1) {
+    } else if (difference.inDays == 1) {
       return 'Был(а) вчера в $time';
-    }
-
-    else if (lastSeen.year == now.year) {
+    } else if (lastSeen.year == now.year) {
       final months = [
         'января',
         'февраля',
@@ -106,9 +102,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         'декабря'
       ];
       return 'Был(а) ${lastSeen.day} ${months[lastSeen.month - 1]} в $time';
-    }
-
-    else {
+    } else {
       final months = [
         'января',
         'февраля',
@@ -130,11 +124,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
-
             Container(
               margin: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -162,7 +155,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 ),
               ),
             ),
-
             Container(
               padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 12.0),
               alignment: Alignment.centerLeft,
@@ -175,7 +167,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 ),
               ),
             ),
-
             Expanded(
               child: ListView.builder(
                 itemCount: _filteredContacts.length,
@@ -206,7 +197,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
                           padding: const EdgeInsets.all(16.0),
                           child: Row(
                             children: [
-
                               Container(
                                 width: 48.0,
                                 height: 48.0,
@@ -227,7 +217,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                 ),
                               ),
                               const SizedBox(width: 16.0),
-
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,9 +232,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                     const SizedBox(height: 4.0),
                                     Text(
                                       contact.isOnline
-                                          ? 'В сети'
+                                          ? AppStrings.online
                                           : contact.lastSeen != null
-                                              ? _formatLastSeen(contact.lastSeen!)
+                                              ? _formatLastSeen(
+                                                  contact.lastSeen!)
                                               : 'Недавно',
                                       style: TextStyle(
                                         fontSize: 14.0,

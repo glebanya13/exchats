@@ -122,7 +122,8 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => ConfirmPasswordScreen(
-                                password: _controllers.map((c) => c.text).join(),
+                                password:
+                                    _controllers.map((c) => c.text).join(),
                               ),
                             ),
                           );
@@ -238,12 +239,10 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
         if (_controllers.every((c) => c.text.isNotEmpty)) {
           final enteredPassword = _controllers.map((c) => c.text).join();
           if (enteredPassword == widget.password) {
-
             final prefs = await SharedPreferences.getInstance();
             await prefs.setString('app_password', widget.password);
             Navigator.of(context).popUntil((route) => route.isFirst);
           } else {
-
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Пароли не совпадают'),
@@ -325,14 +324,15 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
                 child: ElevatedButton(
                   onPressed: _controllers.every((c) => c.text.isNotEmpty)
                       ? () async {
-                          final enteredPassword = _controllers.map((c) => c.text).join();
+                          final enteredPassword =
+                              _controllers.map((c) => c.text).join();
                           if (enteredPassword == widget.password) {
-
                             final prefs = await SharedPreferences.getInstance();
-                            await prefs.setString('app_password', widget.password);
-                            Navigator.of(context).popUntil((route) => route.isFirst);
+                            await prefs.setString(
+                                'app_password', widget.password);
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
                           } else {
-
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Пароли не совпадают'),
@@ -408,4 +408,3 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
     );
   }
 }
-

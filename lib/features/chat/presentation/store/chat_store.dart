@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 import '../../domain/usecase/chat_usecase.dart';
 import '../../domain/entity/chat_entity.dart';
@@ -16,7 +17,8 @@ abstract class _ChatStore with Store {
   ObservableList<ChatEntity> chats = ObservableList<ChatEntity>();
 
   @observable
-  ObservableMap<String, MessageEntity?> lastMessages = ObservableMap<String, MessageEntity?>();
+  ObservableMap<String, MessageEntity?> lastMessages =
+      ObservableMap<String, MessageEntity?>();
 
   @observable
   bool chatsLoaded = false;
@@ -33,22 +35,28 @@ abstract class _ChatStore with Store {
     error = null;
     chatsLoaded = false;
     try {
-      print('ChatStore: Loading chats for userId: $userId');
+      if (kDebugMode) {
+        debugPrint('ChatStore: Loading chats for userId: $userId');
+      }
       final loadedChats = await _chatUseCase.getUserChats(userId);
-      print('ChatStore: Loaded ${loadedChats.length} chats');
+      if (kDebugMode) {
+        debugPrint('ChatStore: Loaded ${loadedChats.length} chats');
+      }
       chats.clear();
       chats.addAll(loadedChats);
-      print('ChatStore: Added ${chats.length} chats to observable list');
+      if (kDebugMode) {
+        debugPrint('ChatStore: Added ${chats.length} chats to observable list');
+      }
       chatsLoaded = true;
-      
-
 
       for (final chat in loadedChats) {
         _loadLastMessage(chat.id);
       }
     } catch (e, stackTrace) {
-      print('ChatStore: Error loading chats: $e');
-      print('Stack trace: $stackTrace');
+      if (kDebugMode) {
+        debugPrint('ChatStore: Error loading chats: $e');
+        debugPrint('Stack trace: $stackTrace');
+      }
       error = e.toString();
       chatsLoaded = false;
     } finally {
@@ -61,7 +69,6 @@ abstract class _ChatStore with Store {
     try {
       final messages = await _chatUseCase.getChatMessages(chatId);
       if (messages.isNotEmpty) {
-
         final sortedMessages = List<MessageEntity>.from(messages)
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
         lastMessages[chatId] = sortedMessages.first;
@@ -98,4 +105,3 @@ abstract class _ChatStore with Store {
     }
   }
 }
-

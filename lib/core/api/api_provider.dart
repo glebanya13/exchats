@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiProvider {
   late final Dio _dio;
   final String baseUrl;
+  static const _skipAuthKey = 'skipAuth';
 
   ApiProvider({
     required this.baseUrl,
@@ -27,9 +28,12 @@ class ApiProvider {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await _getAccessToken();
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
+          final skipAuth = options.extra[_skipAuthKey] == true;
+          if (!skipAuth) {
+            final token = await _getAccessToken();
+            if (token != null) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
           }
           return handler.next(options);
         },
@@ -37,6 +41,10 @@ class ApiProvider {
           return handler.next(response);
         },
         onError: (error, handler) async {
+          final skipAuth = error.requestOptions.extra[_skipAuthKey] == true;
+          if (skipAuth) {
+            return handler.next(error);
+          }
           if (error.response?.statusCode == 401) {
             final refreshed = await _refreshToken();
             if (refreshed) {
@@ -84,14 +92,21 @@ class ApiProvider {
       if (refreshToken == null) return false;
 
       final response = await _dio.post(
-        '/auth/refresh',
+        '/api/auth/refresh',
         data: {'refresh_token': refreshToken},
+        options: Options(
+          extra: const {_skipAuthKey: true},
+        ),
       );
 
       if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
+        final data = _extractData(response.data);
+        final newAccessToken = data['access_token'] as String? ?? '';
+        if (newAccessToken.isEmpty) {
+          return false;
+        }
         await _saveTokens(
-          accessToken: data['access_token'] as String,
+          accessToken: newAccessToken,
           refreshToken: data['refresh_token'] as String? ?? refreshToken,
         );
         return true;
@@ -183,6 +198,17 @@ class ApiProvider {
       queryParameters: queryParameters,
       options: options,
     );
+  }
+
+  Map<String, dynamic> _extractData(dynamic raw) {
+    if (raw is Map<String, dynamic>) {
+      final data = raw['data'];
+      if (data is Map<String, dynamic>) {
+        return data;
+      }
+      return raw;
+    }
+    return <String, dynamic>{};
   }
 }
 

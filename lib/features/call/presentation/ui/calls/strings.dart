@@ -4,4 +4,3 @@ class CallsStrings {
   static const String kRecent = 'Недавние';
   static const String kCreateCallLink = 'Создать ссылку на звонок';
 }
-

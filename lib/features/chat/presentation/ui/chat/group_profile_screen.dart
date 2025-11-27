@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_strings.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:exchats/core/widgets/appbar_icon_button.dart';
-import '../../../../../../core/di/locator.dart';
-import '../../../../../../features/user/presentation/store/user_store.dart';
-import '../../../../../../features/auth/presentation/store/auth_store.dart';
 import '../../../../../../features/user/domain/entity/user_entity.dart';
+import 'package:exchats/core/util/last_seen_formatter.dart';
 
 class GroupProfileScreen extends StatefulWidget {
   final String groupId;
@@ -26,8 +26,6 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTabIndex = 0;
-  final UserStore _userStore = locator<UserStore>();
-  final AuthStore _authStore = locator<AuthStore>();
   List<UserEntity> _participants = [];
   bool _notificationsEnabled = true;
 
@@ -50,15 +48,15 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
   }
 
   Future<void> _loadParticipants() async {
-
-
     setState(() {
       _participants = [];
     });
   }
 
-  void _showParticipantMenu(BuildContext context, UserEntity user, Offset tapPosition) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+  void _showParticipantMenu(
+      BuildContext context, UserEntity user, Offset tapPosition) {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
     showMenu(
       context: context,
       position: RelativeRect.fromSize(
@@ -80,9 +78,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
               ),
             ],
           ),
-          onTap: () {
-
-          },
+          onTap: () {},
         ),
         PopupMenuItem(
           child: Row(
@@ -103,9 +99,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
               ),
             ],
           ),
-          onTap: () {
-
-          },
+          onTap: () {},
         ),
       ],
     );
@@ -131,15 +125,12 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
           ),
           PopupMenuButton<String>(
             icon: Transform.rotate(
-              angle: 1.5708, 
+              angle: 1.5708,
               child: Icon(Icons.more_vert, color: Colors.black87),
             ),
             onSelected: (value) {
               if (value == 'search') {
-
-              } else if (value == 'leave') {
-
-              }
+              } else if (value == 'leave') {}
             },
             itemBuilder: (context) => [
               PopupMenuItem(
@@ -175,7 +166,6 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             Container(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -214,7 +204,8 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                         const SizedBox(height: 4.0),
                         Row(
                           children: [
-                            Icon(Icons.people, size: 16.0, color: Colors.grey[600]),
+                            Icon(Icons.people,
+                                size: 16.0, color: Colors.grey[600]),
                             const SizedBox(width: 4.0),
                             Text(
                               '${_participants.length} участника',
@@ -231,9 +222,9 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                 ],
               ),
             ),
-
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -279,19 +270,17 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                           _notificationsEnabled = value;
                         });
                       },
-                      activeColor: const Color(0xFF1677FF),
+                      activeColor: AppColors.primary,
                     ),
                   ),
                 ],
               ),
             ),
-
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
               child: InkWell(
-                onTap: () {
-
-                },
+                onTap: () {},
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -310,7 +299,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                       Icon(
                         Icons.person_add,
                         size: 20.0,
-                        color: const Color(0xFF1677FF),
+                        color: AppColors.primary,
                       ),
                       const SizedBox(width: 12.0),
                       Text(
@@ -318,7 +307,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                         style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF1677FF),
+                          color: AppColors.primary,
                         ),
                       ),
                     ],
@@ -326,9 +315,9 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                 ),
               ),
             ),
-
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8.0),
@@ -345,7 +334,8 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                   for (int i = 0; i < _participants.length; i++)
                     GestureDetector(
                       onLongPressStart: (details) {
-                        _showParticipantMenu(context, _participants[i], details.globalPosition);
+                        _showParticipantMenu(
+                            context, _participants[i], details.globalPosition);
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -392,7 +382,13 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          '${_participants[i].firstName} ${_participants[i].lastName}'.trim(),
+                                          _participants[i].name.isNotEmpty
+                                              ? _participants[i].name
+                                              : (_participants[i]
+                                                      .username
+                                                      .isNotEmpty
+                                                  ? '@${_participants[i].username}'
+                                                  : 'Пользователь ${_participants[i].id}'),
                                           style: const TextStyle(
                                             fontSize: 16.0,
                                             fontWeight: FontWeight.w500,
@@ -402,39 +398,53 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                                       ),
                                       if (i == 0)
                                         Padding(
-                                          padding: const EdgeInsets.only(left: 8.0),
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
                                           child: Text(
                                             'Администратор',
                                             style: TextStyle(
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.w500,
-                                              color: const Color(0xFF1677FF),
+                                              color: AppColors.primary,
                                             ),
                                           ),
                                         )
                                       else if (i == _participants.length - 1)
                                         Padding(
-                                          padding: const EdgeInsets.only(left: 8.0),
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
                                           child: Text(
                                             'Владелец',
                                             style: TextStyle(
                                               fontSize: 14.0,
                                               fontWeight: FontWeight.w500,
-                                              color: const Color(0xFF1677FF),
+                                              color: AppColors.primary,
                                             ),
                                           ),
                                         ),
                                     ],
                                   ),
                                   const SizedBox(height: 2.0),
-                                  Text(
-                                    _participants[i].online
-                                        ? 'В сети'
-                                        : 'Был(а) 5 минут назад',
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      color: Colors.grey[600],
-                                    ),
+                                  Builder(
+                                    builder: (_) {
+                                      final participant = _participants[i];
+                                      final isOnline =
+                                          LastSeenFormatter.isOnline(
+                                              participant.lastSeenAt);
+                                      final statusText = isOnline
+                                          ? AppStrings.online
+                                          : LastSeenFormatter.format(
+                                              participant.lastSeenAt);
+                                      return Text(
+                                        statusText,
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          color: isOnline
+                                              ? AppColors.primary
+                                              : Colors.grey[600],
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
@@ -447,7 +457,6 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
               ),
             ),
             const SizedBox(height: 16.0),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
@@ -474,7 +483,6 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
                         ],
                       ),
                     ),
-
                     IndexedStack(
                       index: _selectedTabIndex,
                       children: [
@@ -508,9 +516,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isSelected
-                  ? const Color(0xFF1677FF)
-                  : Colors.transparent,
+              color: isSelected ? AppColors.primary : Colors.transparent,
               width: 2.0,
             ),
           ),
@@ -520,9 +526,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
           style: TextStyle(
             fontSize: 16.0,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            color: isSelected
-                ? const Color(0xFF1677FF)
-                : Colors.grey[600],
+            color: isSelected ? AppColors.primary : Colors.grey[600],
           ),
         ),
       ),
@@ -601,7 +605,7 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
             title: Text(
               'https://example.com',
               style: TextStyle(
-                color: const Color(0xFF1677FF),
+                color: AppColors.primary,
                 fontSize: 14.0,
               ),
             ),
@@ -611,4 +615,3 @@ class _GroupProfileScreenState extends State<GroupProfileScreen>
     );
   }
 }
-

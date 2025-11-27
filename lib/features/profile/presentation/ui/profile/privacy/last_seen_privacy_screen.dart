@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 
 class LastSeenPrivacyScreen extends StatefulWidget {
@@ -139,7 +140,8 @@ class _LastSeenPrivacyScreenState extends State<LastSeenPrivacyScreen> {
         InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               children: [
                 SizedBox(
@@ -147,7 +149,7 @@ class _LastSeenPrivacyScreenState extends State<LastSeenPrivacyScreen> {
                   child: isSelected
                       ? Icon(
                           Icons.check,
-                          color: const Color(0xFF1677FF),
+                          color: AppColors.primary,
                           size: 20.0,
                         )
                       : null,
@@ -249,7 +251,7 @@ class _LastSeenPrivacyScreenState extends State<LastSeenPrivacyScreen> {
             child: CupertinoSwitch(
               value: value,
               onChanged: onChanged,
-              activeColor: const Color(0xFF1677FF),
+              activeColor: AppColors.primary,
             ),
           ),
         ],
@@ -257,4 +259,3 @@ class _LastSeenPrivacyScreenState extends State<LastSeenPrivacyScreen> {
     );
   }
 }
-

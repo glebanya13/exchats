@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class BusinessAccountScreen extends StatelessWidget {
@@ -41,7 +42,8 @@ class BusinessAccountScreen extends StatelessWidget {
                     iconAsset: 'assets/profile/bussines/hello.svg',
                     iconColor: Colors.purple,
                     title: 'Приветствия',
-                    subtitle: 'Автоматическое сообщение для новых пользователей',
+                    subtitle:
+                        'Автоматическое сообщение для новых пользователей',
                   ),
                   const SizedBox(height: 8.0),
                   _buildBusinessItem(
@@ -53,16 +55,18 @@ class BusinessAccountScreen extends StatelessWidget {
                   const SizedBox(height: 8.0),
                   _buildBusinessItem(
                     iconAsset: 'assets/profile/bussines/link.svg',
-                    iconColor: const Color(0xFF1677FF),
+                    iconColor: AppColors.primary,
                     title: 'Ссылки на чат',
-                    subtitle: 'Ссылки для открытия чата с Вами с подстановкой текста',
+                    subtitle:
+                        'Ссылки для открытия чата с Вами с подстановкой текста',
                   ),
                   const SizedBox(height: 8.0),
                   _buildBusinessItem(
                     iconAsset: 'assets/profile/bussines/chatbot.svg',
-                    iconColor: const Color(0xFF1677FF),
+                    iconColor: AppColors.primary,
                     title: 'Чат-боты',
-                    subtitle: 'Подключение сторонних ботов для взаимодействия с пользователями',
+                    subtitle:
+                        'Подключение сторонних ботов для взаимодействия с пользователями',
                   ),
                   const SizedBox(height: 32.0),
                 ],
@@ -76,7 +80,7 @@ class BusinessAccountScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1677FF),
+                  backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
@@ -164,4 +168,3 @@ class BusinessAccountScreen extends StatelessWidget {
     );
   }
 }
-

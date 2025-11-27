@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 
 class ProfilePhotosPrivacyScreen extends StatefulWidget {
   const ProfilePhotosPrivacyScreen({Key? key}) : super(key: key);
 
   @override
-  _ProfilePhotosPrivacyScreenState createState() => _ProfilePhotosPrivacyScreenState();
+  _ProfilePhotosPrivacyScreenState createState() =>
+      _ProfilePhotosPrivacyScreenState();
 }
 
-class _ProfilePhotosPrivacyScreenState extends State<ProfilePhotosPrivacyScreen> {
+class _ProfilePhotosPrivacyScreenState
+    extends State<ProfilePhotosPrivacyScreen> {
   String _whoSeesPhotos = 'Контакты';
 
   @override
@@ -124,7 +127,8 @@ class _ProfilePhotosPrivacyScreenState extends State<ProfilePhotosPrivacyScreen>
         InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               children: [
                 SizedBox(
@@ -132,7 +136,7 @@ class _ProfilePhotosPrivacyScreenState extends State<ProfilePhotosPrivacyScreen>
                   child: isSelected
                       ? Icon(
                           Icons.check,
-                          color: const Color(0xFF1677FF),
+                          color: AppColors.primary,
                           size: 20.0,
                         )
                       : null,
@@ -206,4 +210,3 @@ class _ProfilePhotosPrivacyScreenState extends State<ProfilePhotosPrivacyScreen>
     );
   }
 }
-

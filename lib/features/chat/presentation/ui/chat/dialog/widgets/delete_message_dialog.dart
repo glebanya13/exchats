@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../../../../core/constants/app_colors.dart';
 
 class DeleteMessageDialog extends StatefulWidget {
   const DeleteMessageDialog({Key? key}) : super(key: key);
@@ -51,13 +52,13 @@ class _DeleteMessageDialogState extends State<DeleteMessageDialog> {
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: _deleteForEveryone
-                          ? const Color(0xFF1677FF)
+                          ? AppColors.primary
                           : Colors.grey[400]!,
                       width: 2.0,
                     ),
                     borderRadius: BorderRadius.circular(4.0),
                     color: _deleteForEveryone
-                        ? const Color(0xFF1677FF)
+                        ? AppColors.primary
                         : Colors.transparent,
                   ),
                   child: _deleteForEveryone
@@ -90,7 +91,7 @@ class _DeleteMessageDialogState extends State<DeleteMessageDialog> {
             style: TextStyle(
               fontSize: 17.0,
               fontWeight: FontWeight.normal,
-              color: Color(0xFF1677FF),
+              color: AppColors.primary,
             ),
           ),
         ),

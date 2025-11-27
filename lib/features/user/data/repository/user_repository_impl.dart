@@ -3,49 +3,18 @@ import '../../domain/repository/user_repository.dart';
 import '../../domain/entity/user_entity.dart';
 import '../../../../core/api/api_service.dart';
 import '../mapper/user_mapper.dart';
+import '../datasource/user_api_service.dart';
+import '../dto/update_user_request_dto.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final ApiService _apiService;
+  final UserApiService _userApiService;
   final Map<String, StreamController<UserEntity?>> _userStreams = {};
 
-  UserRepositoryImpl(this._apiService);
+  UserRepositoryImpl(this._apiService, this._userApiService);
 
   @override
   Future<UserEntity?> getUserById(String id) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    
-    if (id == 'user2') {
-      return UserEntity(
-        id: 'user2',
-        username: 'artem',
-        firstName: 'Артём',
-        lastName: '',
-        phoneNumber: '+0987654321',
-        online: true,
-        chats: [],
-      );
-    } else if (id == 'user3') {
-      return UserEntity(
-        id: 'user3',
-        username: 'valery',
-        firstName: 'Валерий',
-        lastName: '',
-        phoneNumber: '+1122334455',
-        online: false,
-        chats: [],
-      );
-    } else if (id == 'user4') {
-      return UserEntity(
-        id: 'user4',
-        username: 'maria',
-        firstName: 'Мария',
-        lastName: '',
-        phoneNumber: '+5566778899',
-        online: true,
-        chats: [],
-      );
-    }
-    
     try {
       final userDto = await _apiService.getUserById(id);
       return UserMapper.toEntity(userDto);
@@ -63,14 +32,16 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<UserEntity> updateUser(UserEntity user) async {
-    final userDto = UserMapper.toDto(user);
-    final updatedDto = await _apiService.updateUser(user.id, userDto);
+    final request = UpdateUserRequestDto(
+      name: user.name,
+      username: user.username,
+      avatarUrl: user.avatarUrl.isNotEmpty ? user.avatarUrl : null,
+    );
+    final updatedDto = await _userApiService.updateUser(
+      id: user.id,
+      body: request,
+    );
     return UserMapper.toEntity(updatedDto);
-  }
-
-  @override
-  Future<void> updateOnlineStatus(String id, bool online) async {
-    await _apiService.updateOnlineStatus(id, online);
   }
 
   @override
@@ -84,7 +55,7 @@ class UserRepositoryImpl implements UserRepository {
     if (!_userStreams.containsKey(id)) {
       final controller = StreamController<UserEntity?>.broadcast();
       _userStreams[id] = controller;
-      
+
       Timer.periodic(const Duration(seconds: 5), (timer) async {
         if (controller.isClosed) {
           timer.cancel();
@@ -93,7 +64,7 @@ class UserRepositoryImpl implements UserRepository {
         final user = await getUserById(id);
         controller.add(user);
       });
-      
+
       getUserById(id).then((user) {
         if (!controller.isClosed) {
           controller.add(user);

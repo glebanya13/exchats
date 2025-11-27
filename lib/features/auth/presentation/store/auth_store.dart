@@ -31,30 +31,32 @@ abstract class _AuthStore with Store {
     isLoading = true;
     error = null;
     try {
-      final userId = await _authUseCase.getCurrentUserId();
-      if (userId != null) {
-        currentUserId = userId;
+      final user = await _authUseCase.getCurrentUser();
+      if (user != null) {
+        currentUser = user;
+        currentUserId = user.id;
         isAuthenticated = true;
       } else {
-        isAuthenticated = false;
+        currentUser = null;
         currentUserId = null;
+        isAuthenticated = false;
       }
     } catch (e) {
       error = e.toString();
       isAuthenticated = false;
       currentUserId = null;
+      currentUser = null;
     } finally {
       isLoading = false;
     }
   }
 
   @action
-  Future<String> sendVerificationCode(String phoneNumber) async {
+  Future<void> sendVerificationCode(String phoneNumber) async {
     isLoading = true;
     error = null;
     try {
-      final verificationId = await _authUseCase.sendVerificationCode(phoneNumber);
-      return verificationId;
+      await _authUseCase.sendVerificationCode(phoneNumber);
     } catch (e) {
       error = e.toString();
       rethrow;
@@ -104,5 +106,12 @@ abstract class _AuthStore with Store {
     } finally {
       isLoading = false;
     }
+  }
+
+  @action
+  void updateCurrentUser(UserEntity user) {
+    currentUser = user;
+    currentUserId = user.id;
+    isAuthenticated = true;
   }
 }

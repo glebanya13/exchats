@@ -24,9 +24,9 @@ class MockApiService implements ApiService {
     required String code,
   }) async {
     await Future.delayed(const Duration(seconds: 1));
-    
+
     for (final entry in MockData.users.entries) {
-      if (entry.value.phoneNumber == phoneNumber) {
+      if (entry.value.phone == phoneNumber) {
         return {
           'access_token': 'mock_access_token_${_random.nextInt(10000)}',
           'refresh_token': 'mock_refresh_token_${_random.nextInt(10000)}',
@@ -34,18 +34,20 @@ class MockApiService implements ApiService {
         };
       }
     }
-    
+
     final userId = 'user_${_random.nextInt(10000)}';
     MockData.users[userId] = UserDto(
       id: userId,
+      name: 'User',
       username: phoneNumber.replaceAll('+', ''),
-      firstName: 'User',
-      lastName: '',
-      phoneNumber: phoneNumber,
-      online: true,
+      phone: phoneNumber,
+      email: '$phoneNumber@example.com',
+      avatarUrl: '',
+      insertedAt: DateTime.now(),
+      lastSeenAt: DateTime.now(),
       chats: [],
     );
-    
+
     return {
       'access_token': 'mock_access_token_${_random.nextInt(10000)}',
       'refresh_token': 'mock_refresh_token_${_random.nextInt(10000)}',
@@ -60,14 +62,16 @@ class MockApiService implements ApiService {
     if (user != null) {
       return user;
     }
-    
+
     return UserDto(
       id: id,
+      name: 'User',
       username: 'user_$id',
-      firstName: 'User',
-      lastName: '',
-      phoneNumber: '+0000000000',
-      online: false,
+      phone: '+0000000000',
+      email: 'user_$id@example.com',
+      avatarUrl: '',
+      insertedAt: DateTime.now(),
+      lastSeenAt: DateTime.now(),
       chats: [],
     );
   }
@@ -84,11 +88,13 @@ class MockApiService implements ApiService {
     await Future.delayed(const Duration(milliseconds: 300));
     final updatedUser = UserDto(
       id: id,
+      name: user.name,
       username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phoneNumber: user.phoneNumber,
-      online: user.online,
+      phone: user.phone,
+      email: user.email,
+      avatarUrl: user.avatarUrl,
+      insertedAt: user.insertedAt,
+      lastSeenAt: user.lastSeenAt,
       chats: user.chats,
     );
     MockData.users[id] = updatedUser;
@@ -96,28 +102,11 @@ class MockApiService implements ApiService {
   }
 
   @override
-  Future<void> updateOnlineStatus(String id, bool online) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    final user = MockData.users[id];
-    if (user != null) {
-      MockData.users[id] = UserDto(
-        id: user.id,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phoneNumber: user.phoneNumber,
-        online: online,
-        chats: user.chats,
-      );
-    }
-  }
-
-  @override
   Future<List<ChatDto>> getUserChats(String userId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final user = MockData.users[userId];
     if (user == null) return [];
-    
+
     return user.chats
         .map((chatId) => MockData.chats[chatId])
         .whereType<ChatDto>()
@@ -131,7 +120,7 @@ class MockApiService implements ApiService {
     if (chat != null) {
       return chat;
     }
-    
+
     return ChatDto(
       id: id,
       type: 'dialog',
@@ -164,7 +153,8 @@ class MockApiService implements ApiService {
   }
 
   @override
-  Future<MessageDto> updateMessage(String chatId, String messageId, MessageDto message) async {
+  Future<MessageDto> updateMessage(
+      String chatId, String messageId, MessageDto message) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final messages = MockData.messages[chatId] ?? [];
     final index = messages.indexWhere((m) => m.id == messageId);
@@ -184,7 +174,8 @@ class MockApiService implements ApiService {
   }
 
   @override
-  Future<void> markMessagesAsRead(String chatId, List<String> messageIds) async {
+  Future<void> markMessagesAsRead(
+      String chatId, List<String> messageIds) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final messages = MockData.messages[chatId] ?? [];
     for (final message in messages) {

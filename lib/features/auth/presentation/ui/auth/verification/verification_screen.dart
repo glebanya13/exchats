@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../../core/di/locator.dart';
@@ -53,7 +54,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -74,7 +75,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
                   Image.asset(
                     'assets/auth/logo.png',
                     width: 64.0,
@@ -92,7 +92,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     },
                   ),
                   const SizedBox(height: 24.0),
-
                   Text(
                     'Код верификации',
                     style: TextStyle(
@@ -102,7 +101,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ),
                   ),
                   const SizedBox(height: 8.0),
-
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -112,9 +110,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+                          padding:
+                              const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
                           child: Text(
                             _errorMessage != null
                                 ? _errorMessage!
@@ -131,10 +129,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             children: [
-
                               _buildCodeInputs(theme),
                               const SizedBox(height: 32.0),
-
                               _buildLoginButton(theme),
                             ],
                           ),
@@ -143,7 +139,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ),
                   ),
                   const SizedBox(height: 24.0),
-
                   _buildTermsLink(theme),
                 ],
               ),
@@ -231,30 +226,32 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
   Future<void> _checkCode() async {
     final code = _controllers.map((c) => c.text).join();
+    if (!mounted) return;
     setState(() {
       _isCodeComplete = code.length == 6;
     });
-    
-      if (_isCodeComplete) {
+
+    if (_isCodeComplete) {
       try {
         final authStore = locator<AuthStore>();
         await authStore.verifyCode(
           phoneNumber: widget.phoneNumber,
           code: code,
         );
-        if (mounted) {
-          context.go('/');
-        }
+        if (!mounted) return;
+        context.go('/');
       } catch (e) {
+        if (!mounted) return;
         setState(() {
-          _errorMessage = 'Не верно указанный код';
+          _errorMessage = 'Неверный или просроченный код';
         });
-        }
-      } else {
+      }
+    } else {
+      if (!mounted) return;
       setState(() {
         _errorMessage = null;
       });
-      }
+    }
   }
 
   Widget _buildLoginButton(ThemeData theme) {
@@ -292,9 +289,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
   Widget _buildTermsLink(ThemeData theme) {
     return GestureDetector(
-      onTap: () {
-
-      },
+      onTap: () {},
       child: Text(
         'Условия публичной оферты',
         style: TextStyle(

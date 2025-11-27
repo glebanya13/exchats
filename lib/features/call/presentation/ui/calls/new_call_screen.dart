@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:exchats/core/widgets/appbar_icon_button.dart';
 
@@ -64,7 +65,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -86,7 +87,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
       body: SafeArea(
         child: Column(
           children: [
-
             Container(
               margin: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -114,7 +114,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
                 ),
               ),
             ),
-
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16.0),
               decoration: BoxDecoration(
@@ -143,10 +142,10 @@ class _NewCallScreenState extends State<NewCallScreen> {
                     child: Row(
                       children: [
                         Transform.rotate(
-                          angle: 0.785398, 
+                          angle: 0.785398,
                           child: Icon(
                             Icons.link,
-                            color: const Color(0xFF1677FF),
+                            color: AppColors.primary,
                             size: 24.0,
                           ),
                         ),
@@ -156,7 +155,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFF1677FF),
+                            color: AppColors.primary,
                           ),
                         ),
                       ],
@@ -166,7 +165,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
-
             Expanded(
               child: ListView.builder(
                 itemCount: _filteredContacts.length,
@@ -186,14 +184,13 @@ class _NewCallScreenState extends State<NewCallScreen> {
               width: 56.0,
               height: 56.0,
               decoration: BoxDecoration(
-                color: const Color(0xFF1677FF),
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-
                     Navigator.of(context).pop();
                   },
                   borderRadius: BorderRadius.circular(8.0),
@@ -225,7 +222,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Row(
           children: [
-
             Container(
               width: 48.0,
               height: 48.0,
@@ -246,7 +242,6 @@ class _NewCallScreenState extends State<NewCallScreen> {
               ),
             ),
             const SizedBox(width: 16.0),
-
             Expanded(
               child: Text(
                 contact.name,
@@ -260,7 +255,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
             if (isSelected)
               Icon(
                 Icons.check_circle,
-                color: const Color(0xFF1677FF),
+                color: AppColors.primary,
                 size: 24.0,
               ),
           ],

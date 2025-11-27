@@ -89,12 +89,13 @@ class _TypingIndicatorState extends State<TypingIndicator>
               ),
             )
           else
-            const SizedBox(width: 8.0), 
+            const SizedBox(width: 8.0),
           Container(
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.75,
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(12.0),
@@ -112,7 +113,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
                       width: 8.0,
                       height: 8.0,
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3 + (_animations[index].value * 0.4)),
+                        color: Colors.black.withOpacity(
+                            0.3 + (_animations[index].value * 0.4)),
                         shape: BoxShape.circle,
                       ),
                     );
@@ -126,4 +128,3 @@ class _TypingIndicatorState extends State<TypingIndicator>
     );
   }
 }
-

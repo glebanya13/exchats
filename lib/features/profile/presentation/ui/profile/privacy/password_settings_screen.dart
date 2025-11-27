@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:exchats/features/profile/presentation/ui/profile/privacy/create_password_screen.dart';
@@ -134,7 +135,7 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
             child: CupertinoSwitch(
               value: value,
               onChanged: onChanged,
-              activeColor: const Color(0xFF1677FF),
+              activeColor: AppColors.primary,
             ),
           ),
         ],
@@ -170,4 +171,3 @@ class _PasswordSettingsScreenState extends State<PasswordSettingsScreen> {
     );
   }
 }
-

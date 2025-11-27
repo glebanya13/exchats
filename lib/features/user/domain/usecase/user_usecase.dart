@@ -19,10 +19,6 @@ class UserUseCase {
     return _userRepository.updateUser(user);
   }
 
-  Future<void> updateOnlineStatus(String id, bool online) {
-    return _userRepository.updateOnlineStatus(id, online);
-  }
-
   Future<List<String>> getUserChats(String userId) {
     return _userRepository.getUserChats(userId);
   }
@@ -31,4 +27,3 @@ class UserUseCase {
     return _userRepository.watchUser(id);
   }
 }
-

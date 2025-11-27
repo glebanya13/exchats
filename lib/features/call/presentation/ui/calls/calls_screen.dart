@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../domain/entity/call_entity.dart';
-import '../call/active_call_screen.dart';
 
-import 'new_call_screen.dart';
 import 'strings.dart';
 
 class CallsScreen extends StatefulWidget {
@@ -29,7 +28,7 @@ class _CallsScreenState extends State<CallsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -89,7 +88,7 @@ class _CallsScreenState extends State<CallsScreen> {
                       children: [
                         Icon(
                           Icons.phone,
-                          color: const Color(0xFF1677FF),
+                          color: AppColors.primary,
                           size: 24.0,
                         ),
                         const SizedBox(width: 12.0),
@@ -98,7 +97,7 @@ class _CallsScreenState extends State<CallsScreen> {
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFF1677FF),
+                            color: AppColors.primary,
                           ),
                         ),
                       ],
@@ -195,7 +194,9 @@ class _CallsScreenState extends State<CallsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        showCount ? '${call.userName} ($callCount)' : call.userName,
+                        showCount
+                            ? '${call.userName} ($callCount)'
+                            : call.userName,
                         style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w500,

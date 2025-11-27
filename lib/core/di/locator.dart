@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_provider.dart';
 import '../api/api_service.dart';
 import '../api/mock_api_service.dart';
+import '../../features/auth/data/datasource/auth_api_service.dart';
+import '../../features/user/data/datasource/user_api_service.dart';
 import '../../features/auth/data/repository/auth_repository_impl.dart';
 import '../../features/user/data/repository/user_repository_impl.dart';
 import '../../features/chat/data/repository/chat_repository_impl.dart';
@@ -23,22 +25,32 @@ Future<void> setupLocator() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   locator.registerSingleton<SharedPreferences>(sharedPreferences);
 
-  const baseUrl = 'https://api.example.com';
+  const baseUrl = 'https://exchats.com';
   locator.registerSingleton<ApiProvider>(
     ApiProvider(baseUrl: baseUrl),
   );
   locator.registerSingleton<ApiService>(
     MockApiService(),
   );
+  locator.registerLazySingleton<AuthApiService>(
+    () => AuthApiService(locator<ApiProvider>()),
+  );
+  locator.registerLazySingleton<UserApiService>(
+    () => UserApiService(locator<ApiProvider>()),
+  );
 
   locator.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
-      locator<ApiService>(),
+      locator<AuthApiService>(),
+      locator<ApiProvider>(),
       locator<SharedPreferences>(),
     ),
   );
   locator.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(locator<ApiService>()),
+    () => UserRepositoryImpl(
+      locator<ApiService>(),
+      locator<UserApiService>(),
+    ),
   );
   locator.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(locator<ApiService>()),
@@ -63,7 +75,7 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<ChatStore>(
     () => ChatStore(locator<ChatUseCase>()),
   );
-  
+
   locator.registerFactory<MessageStore>(
     () => MessageStore(locator<ChatUseCase>()),
   );

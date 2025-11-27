@@ -15,7 +15,7 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<List<ChatEntity>> getUserChats(String userId) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     return [
       ChatEntity(
         id: 'chat1',
@@ -37,7 +37,7 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<ChatEntity?> getChatById(String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     if (id == 'chat1') {
       return ChatEntity(
         id: 'chat1',
@@ -55,7 +55,7 @@ class ChatRepositoryImpl implements ChatRepository {
         users: ['user1', 'user2', 'user3', 'user4'],
       );
     }
-    
+
     return null;
   }
 
@@ -69,9 +69,9 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<List<MessageEntity>> getChatMessages(String chatId) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     final now = DateTime.now();
-    
+
     if (chatId == 'chat1') {
       return [
         MessageEntity(
@@ -88,8 +88,10 @@ class ChatRepositoryImpl implements ChatRepository {
           id: 'msg2',
           owner: 'user1',
           text: 'Привет! Всё отлично, спасибо! А у тебя как?',
-          createdAt: now.subtract(const Duration(days: 2, hours: 2, minutes: 50)),
-          updatedAt: now.subtract(const Duration(days: 2, hours: 2, minutes: 50)),
+          createdAt:
+              now.subtract(const Duration(days: 2, hours: 2, minutes: 50)),
+          updatedAt:
+              now.subtract(const Duration(days: 2, hours: 2, minutes: 50)),
           edited: false,
           read: true,
           type: 'text',
@@ -98,8 +100,10 @@ class ChatRepositoryImpl implements ChatRepository {
           id: 'msg3',
           owner: 'user2',
           text: 'Тоже всё хорошо! Спасибо, что спросил 😊',
-          createdAt: now.subtract(const Duration(days: 2, hours: 2, minutes: 40)),
-          updatedAt: now.subtract(const Duration(days: 2, hours: 2, minutes: 40)),
+          createdAt:
+              now.subtract(const Duration(days: 2, hours: 2, minutes: 40)),
+          updatedAt:
+              now.subtract(const Duration(days: 2, hours: 2, minutes: 40)),
           edited: false,
           read: true,
           type: 'text',
@@ -118,8 +122,10 @@ class ChatRepositoryImpl implements ChatRepository {
           id: 'msg5',
           owner: 'user2',
           text: 'Конечно помню! В 10:00, правильно?',
-          createdAt: now.subtract(const Duration(days: 1, hours: 4, minutes: 50)),
-          updatedAt: now.subtract(const Duration(days: 1, hours: 4, minutes: 50)),
+          createdAt:
+              now.subtract(const Duration(days: 1, hours: 4, minutes: 50)),
+          updatedAt:
+              now.subtract(const Duration(days: 1, hours: 4, minutes: 50)),
           edited: false,
           read: true,
           type: 'text',
@@ -128,8 +134,10 @@ class ChatRepositoryImpl implements ChatRepository {
           id: 'msg6',
           owner: 'user1',
           text: 'Да, именно так! Увидимся там',
-          createdAt: now.subtract(const Duration(days: 1, hours: 4, minutes: 45)),
-          updatedAt: now.subtract(const Duration(days: 1, hours: 4, minutes: 45)),
+          createdAt:
+              now.subtract(const Duration(days: 1, hours: 4, minutes: 45)),
+          updatedAt:
+              now.subtract(const Duration(days: 1, hours: 4, minutes: 45)),
           edited: false,
           read: true,
           type: 'text',
@@ -138,8 +146,10 @@ class ChatRepositoryImpl implements ChatRepository {
           id: 'msg7',
           owner: 'user2',
           text: 'Отлично! До встречи! 👋',
-          createdAt: now.subtract(const Duration(days: 1, hours: 4, minutes: 40)),
-          updatedAt: now.subtract(const Duration(days: 1, hours: 4, minutes: 40)),
+          createdAt:
+              now.subtract(const Duration(days: 1, hours: 4, minutes: 40)),
+          updatedAt:
+              now.subtract(const Duration(days: 1, hours: 4, minutes: 40)),
           edited: false,
           read: true,
           type: 'text',
@@ -349,21 +359,24 @@ class ChatRepositoryImpl implements ChatRepository {
         ),
       ];
     }
-    
+
     return [];
   }
 
   @override
-  Future<MessageEntity> sendMessage(String chatId, MessageEntity message) async {
+  Future<MessageEntity> sendMessage(
+      String chatId, MessageEntity message) async {
     final messageDto = MessageMapper.toDto(message);
     final sentDto = await _apiService.sendMessage(chatId, messageDto);
     return MessageMapper.toEntity(sentDto);
   }
 
   @override
-  Future<MessageEntity> updateMessage(String chatId, String messageId, MessageEntity message) async {
+  Future<MessageEntity> updateMessage(
+      String chatId, String messageId, MessageEntity message) async {
     final messageDto = MessageMapper.toDto(message);
-    final updatedDto = await _apiService.updateMessage(chatId, messageId, messageDto);
+    final updatedDto =
+        await _apiService.updateMessage(chatId, messageId, messageDto);
     return MessageMapper.toEntity(updatedDto);
   }
 
@@ -373,7 +386,8 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<void> markMessagesAsRead(String chatId, List<String> messageIds) async {
+  Future<void> markMessagesAsRead(
+      String chatId, List<String> messageIds) async {
     await _apiService.markMessagesAsRead(chatId, messageIds);
   }
 
@@ -382,7 +396,7 @@ class ChatRepositoryImpl implements ChatRepository {
     if (!_messageStreams.containsKey(chatId)) {
       final controller = StreamController<List<MessageEntity>>.broadcast();
       _messageStreams[chatId] = controller;
-      
+
       Timer.periodic(const Duration(seconds: 2), (timer) async {
         if (controller.isClosed) {
           timer.cancel();
@@ -391,7 +405,7 @@ class ChatRepositoryImpl implements ChatRepository {
         final messages = await getChatMessages(chatId);
         controller.add(messages);
       });
-      
+
       getChatMessages(chatId).then((messages) {
         if (!controller.isClosed) {
           controller.add(messages);

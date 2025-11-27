@@ -129,9 +129,7 @@ class BlackListScreen extends StatelessWidget {
               color: Colors.grey[600],
             ),
             onSelected: (value) {
-              if (value == 'unblock') {
-
-              }
+              if (value == 'unblock') {}
             },
             itemBuilder: (context) => [
               PopupMenuItem(
@@ -145,4 +143,3 @@ class BlackListScreen extends StatelessWidget {
     );
   }
 }
-

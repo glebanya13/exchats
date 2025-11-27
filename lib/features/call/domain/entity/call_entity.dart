@@ -2,7 +2,7 @@ class CallEntity {
   final String id;
   final String userId;
   final String userName;
-  final String type; 
+  final String type;
   final DateTime date;
 
   CallEntity({
@@ -36,4 +36,3 @@ class CallType {
   static const String Incoming = 'incoming';
   static const String Outgoing = 'outgoing';
 }
-

@@ -4,4 +4,3 @@ class CallStrings {
   static const String kRinging = 'Ringing...';
   static const String kConnecting = 'Connecting...';
 }
-

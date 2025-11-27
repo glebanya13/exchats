@@ -5,11 +5,13 @@ class UserMapper {
   static UserEntity toEntity(UserDto dto) {
     return UserEntity(
       id: dto.id,
+      name: dto.name,
       username: dto.username,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      phoneNumber: dto.phoneNumber,
-      online: dto.online,
+      phone: dto.phone,
+      email: dto.email,
+      avatarUrl: dto.avatarUrl,
+      insertedAt: dto.insertedAt,
+      lastSeenAt: dto.lastSeenAt,
       chats: dto.chats,
     );
   }
@@ -17,13 +19,14 @@ class UserMapper {
   static UserDto toDto(UserEntity entity) {
     return UserDto(
       id: entity.id,
+      name: entity.name,
       username: entity.username,
-      firstName: entity.firstName,
-      lastName: entity.lastName,
-      phoneNumber: entity.phoneNumber,
-      online: entity.online,
+      phone: entity.phone,
+      email: entity.email,
+      avatarUrl: entity.avatarUrl,
+      insertedAt: entity.insertedAt,
+      lastSeenAt: entity.lastSeenAt,
       chats: entity.chats,
     );
   }
 }
-

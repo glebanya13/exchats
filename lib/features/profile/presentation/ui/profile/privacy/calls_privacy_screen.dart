@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 
 class CallsPrivacyScreen extends StatefulWidget {
   const CallsPrivacyScreen({Key? key}) : super(key: key);
@@ -124,7 +125,8 @@ class _CallsPrivacyScreenState extends State<CallsPrivacyScreen> {
         InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               children: [
                 SizedBox(
@@ -132,7 +134,7 @@ class _CallsPrivacyScreenState extends State<CallsPrivacyScreen> {
                   child: isSelected
                       ? Icon(
                           Icons.check,
-                          color: const Color(0xFF1677FF),
+                          color: AppColors.primary,
                           size: 20.0,
                         )
                       : null,
@@ -206,4 +208,3 @@ class _CallsPrivacyScreenState extends State<CallsPrivacyScreen> {
     );
   }
 }
-

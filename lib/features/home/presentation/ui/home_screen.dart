@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:exchats/core/di/locator.dart';
 import 'package:exchats/core/widgets/safe_svg_icon.dart';
+import 'package:exchats/core/constants/app_colors.dart';
 import 'package:exchats/features/user/presentation/store/user_store.dart';
 import 'package:exchats/features/auth/presentation/store/auth_store.dart';
 
@@ -16,14 +17,13 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final UserStore _userStore;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _userStore = locator<UserStore>();
     final authStore = locator<AuthStore>();
     if (authStore.currentUserId != null) {
@@ -32,182 +32,173 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final authStore = locator<AuthStore>();
-    if (authStore.currentUserId != null) {
-    if (state == AppLifecycleState.resumed) {
-        _userStore.updateOnlineStatus(true);
-    } else if (state == AppLifecycleState.inactive) {
-        _userStore.updateOnlineStatus(false);
-      }
-    }
-  }
-
-  @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
-        return Scaffold(
-          body: IndexedStack(
-            index: _currentIndex,
+
+    return Scaffold(
+      body: IndexedStack(
+        index: _currentIndex,
         children: [
           ChatsScreen(),
           CallsScreen(),
           ContactsScreen(),
           ProfileScreen(),
         ],
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: const Color(0xFF1677FF),
-            unselectedItemColor: theme.textTheme.bodyLarge?.color,
-            items: [
-              BottomNavigationBarItem(
-                icon: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    SafeSvgIcon(
-                      assetPath: 'assets/bottom/message.svg',
-                      width: 24.0,
-                      height: 24.0,
-                      color: _currentIndex == 0
-                          ? const Color(0xFF1677FF)
-                          : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
-                      fallback: Icon(
-                        _currentIndex == 0 ? Icons.chat_bubble : Icons.chat_bubble_outline,
-                        size: 24.0,
-                        color: _currentIndex == 0
-                            ? const Color(0xFF1677FF)
-                            : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
-                      ),
-                    ),
-                    Positioned(
-                      right: -8,
-                      top: -4,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1677FF),
-                          shape: BoxShape.circle,
-                        ),
-                    constraints: const BoxConstraints(
-                          minWidth: 18.0,
-                          minHeight: 18.0,
-                        ),
-                    child: const Center(
-                          child: Text(
-                            '19',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                label: 'Чаты',
-              ),
-              BottomNavigationBarItem(
-                icon: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    SafeSvgIcon(
-                      assetPath: 'assets/bottom/call.svg',
-                      width: 24.0,
-                      height: 24.0,
-                      color: _currentIndex == 1
-                          ? const Color(0xFF1677FF)
-                          : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
-                      fallback: Icon(
-                        _currentIndex == 1 ? Icons.phone : Icons.phone_outlined,
-                        size: 24.0,
-                        color: _currentIndex == 1
-                            ? const Color(0xFF1677FF)
-                            : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
-                      ),
-                    ),
-                    Positioned(
-                      right: -8,
-                      top: -4,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1677FF),
-                          shape: BoxShape.circle,
-                        ),
-                    constraints: const BoxConstraints(
-                          minWidth: 18.0,
-                          minHeight: 18.0,
-                        ),
-                    child: const Center(
-                          child: Text(
-                            '19',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                label: 'Звонки',
-              ),
-              BottomNavigationBarItem(
-                icon: SafeSvgIcon(
-                  assetPath: 'assets/bottom/users.svg',
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: theme.textTheme.bodyLarge?.color,
+        items: [
+          BottomNavigationBarItem(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SafeSvgIcon(
+                  assetPath: 'assets/bottom/message.svg',
                   width: 24.0,
                   height: 24.0,
-                  color: _currentIndex == 2
-                      ? const Color(0xFF1677FF)
+                  color: _currentIndex == 0
+                      ? AppColors.primary
                       : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                   fallback: Icon(
-                    Icons.people_outline,
+                    _currentIndex == 0
+                        ? Icons.chat_bubble
+                        : Icons.chat_bubble_outline,
                     size: 24.0,
-                    color: _currentIndex == 2
-                        ? const Color(0xFF1677FF)
+                    color: _currentIndex == 0
+                        ? AppColors.primary
                         : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                   ),
                 ),
-                label: 'Контакты',
-              ),
-              BottomNavigationBarItem(
-                icon: SafeSvgIcon(
-                  assetPath: 'assets/bottom/profile.svg',
+                Positioned(
+                  right: -8,
+                  top: -4,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6.0, vertical: 2.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 18.0,
+                      minHeight: 18.0,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '19',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            label: 'Чаты',
+          ),
+          BottomNavigationBarItem(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SafeSvgIcon(
+                  assetPath: 'assets/bottom/call.svg',
                   width: 24.0,
                   height: 24.0,
-                  color: _currentIndex == 3
-                      ? const Color(0xFF1677FF)
+                  color: _currentIndex == 1
+                      ? AppColors.primary
                       : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                   fallback: Icon(
-                    Icons.person_outline,
+                    _currentIndex == 1 ? Icons.phone : Icons.phone_outlined,
                     size: 24.0,
-                    color: _currentIndex == 3
-                        ? const Color(0xFF1677FF)
+                    color: _currentIndex == 1
+                        ? AppColors.primary
                         : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
                   ),
                 ),
-                label: 'Профиль',
-              ),
-            ],
+                Positioned(
+                  right: -8,
+                  top: -4,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6.0, vertical: 2.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 18.0,
+                      minHeight: 18.0,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '19',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            label: 'Звонки',
           ),
+          BottomNavigationBarItem(
+            icon: SafeSvgIcon(
+              assetPath: 'assets/bottom/users.svg',
+              width: 24.0,
+              height: 24.0,
+              color: _currentIndex == 2
+                  ? AppColors.primary
+                  : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
+              fallback: Icon(
+                Icons.people_outline,
+                size: 24.0,
+                color: _currentIndex == 2
+                    ? AppColors.primary
+                    : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
+              ),
+            ),
+            label: 'Контакты',
+          ),
+          BottomNavigationBarItem(
+            icon: SafeSvgIcon(
+              assetPath: 'assets/bottom/profile.svg',
+              width: 24.0,
+              height: 24.0,
+              color: _currentIndex == 3
+                  ? AppColors.primary
+                  : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
+              fallback: Icon(
+                Icons.person_outline,
+                size: 24.0,
+                color: _currentIndex == 3
+                    ? AppColors.primary
+                    : (theme.textTheme.bodyLarge?.color ?? Colors.grey),
+              ),
+            ),
+            label: 'Профиль',
+          ),
+        ],
+      ),
     );
   }
 }

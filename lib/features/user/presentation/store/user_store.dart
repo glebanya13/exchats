@@ -39,10 +39,10 @@ abstract class _UserStore with Store {
     _userSubscription = _userUseCase.watchUser(userId).listen((user) {
       if (user != null) {
         this.user = user;
-        formatPhoneNumber(user.phoneNumber);
+        formatPhoneNumber(user.phone);
       }
     });
-    
+
     _loadUser(userId);
   }
 
@@ -72,7 +72,7 @@ abstract class _UserStore with Store {
       final loadedUser = await _userUseCase.getUserById(userId);
       if (loadedUser != null) {
         user = loadedUser;
-        formatPhoneNumber(loadedUser.phoneNumber);
+        formatPhoneNumber(loadedUser.phone);
       }
     } catch (e) {
       error = e.toString();
@@ -90,24 +90,27 @@ abstract class _UserStore with Store {
   }
 
   @action
-  Future<void> updateOnlineStatus(bool online) async {
-    if (user == null) return;
-    
+  Future<UserEntity?> updateProfile({
+    required String name,
+    required String username,
+    String? avatarUrl,
+  }) async {
+    if (user == null) return null;
     isLoading = true;
     error = null;
     try {
-      await _userUseCase.updateOnlineStatus(user!.id, online);
-      user = UserEntity(
-        id: user!.id,
-        username: user!.username,
-        firstName: user!.firstName,
-        lastName: user!.lastName,
-        phoneNumber: user!.phoneNumber,
-        online: online,
-        chats: user!.chats,
+      final entity = user!.copyWith(
+        name: name,
+        username: username,
+        avatarUrl: avatarUrl ?? user!.avatarUrl,
       );
+      final updated = await _userUseCase.updateUser(entity);
+      user = updated;
+      await formatPhoneNumber(updated.phone);
+      return updated;
     } catch (e) {
       error = e.toString();
+      rethrow;
     } finally {
       isLoading = false;
     }

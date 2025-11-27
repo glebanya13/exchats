@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exchats/core/constants/app_strings.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class DevicesScreen extends StatelessWidget {
@@ -21,7 +22,6 @@ class DevicesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16.0),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -40,16 +40,16 @@ class DevicesScreen extends StatelessWidget {
                 deviceName: 'Redmi 12',
                 deviceInfo: 'Android 14, LightPay 2.6.0',
                 ipAddress: '199.191.130.99',
-                status: 'В сети',
+                status: AppStrings.online,
                 isCurrentDevice: true,
               ),
             ),
             const SizedBox(height: 12.0),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8.0),
@@ -75,7 +75,6 @@ class DevicesScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24.0),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -213,4 +212,3 @@ class DevicesScreen extends StatelessWidget {
     );
   }
 }
-
