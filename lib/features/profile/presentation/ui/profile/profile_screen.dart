@@ -8,8 +8,24 @@ import 'package:exchats/features/user/presentation/store/user_store.dart';
 import 'package:exchats/features/auth/presentation/store/auth_store.dart';
 import 'package:exchats/core/util/user_formatter.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final authStore = locator<AuthStore>();
+    if (authStore.isAuthenticated && authStore.currentUser == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        authStore.checkAuthStatus();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +36,14 @@ class ProfileScreen extends StatelessWidget {
     return Observer(
       builder: (_) {
         final user = authStore.currentUser ?? userStore.user;
+        if (user == null && authStore.isLoading) {
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            body: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
         final userName = UserFormatter.resolveUserName(user);
         final phoneNumber = UserFormatter.formatPhone(user?.phone);
         return Scaffold(

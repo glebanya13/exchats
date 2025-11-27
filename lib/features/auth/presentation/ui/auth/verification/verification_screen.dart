@@ -239,6 +239,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
           code: code,
         );
         if (!mounted) return;
+        if (authStore.currentUser == null) {
+          await authStore.checkAuthStatus();
+        }
+        if (!mounted) return;
         context.go('/');
       } catch (e) {
         if (!mounted) return;

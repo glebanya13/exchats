@@ -14,20 +14,22 @@ class AuthTokensDto {
       throw const FormatException('Empty auth response');
     }
     final normalized = _unwrap(json);
-    final access =
-        (normalized['access_token'] ?? normalized['token']) as String? ?? '';
-    final refresh = (normalized['refresh_token'] ?? normalized['refreshToken'])
-            as String? ??
+    final access = (normalized['access_token'] ??
+            normalized['token'] ??
+            normalized['accessToken']) as String? ??
+        '';
+    final refresh = (normalized['refresh_token'] ??
+            normalized['refreshToken'] ??
+            normalized['refresh']) as String? ??
         '';
     final expires = normalized['expires_in'] as int?;
     if (access.isEmpty) {
-      throw const FormatException('Access token not found in response');
+      throw FormatException(
+          'Access token not found in response. Response keys: ${normalized.keys.join(", ")}');
     }
     return AuthTokensDto(
       accessToken: access,
-      refreshToken: refresh.isNotEmpty
-          ? refresh
-          : (normalized['refresh'] as String? ?? ''),
+      refreshToken: refresh.isNotEmpty ? refresh : '',
       expiresIn: expires,
     );
   }

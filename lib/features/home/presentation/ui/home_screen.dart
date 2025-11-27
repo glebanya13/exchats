@@ -26,9 +26,11 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _userStore = locator<UserStore>();
     final authStore = locator<AuthStore>();
-    if (authStore.currentUserId != null) {
-      _userStore.watchUser(authStore.currentUserId!);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (authStore.currentUserId != null) {
+        _userStore.watchUser(authStore.currentUserId!);
+      }
+    });
   }
 
   @override
