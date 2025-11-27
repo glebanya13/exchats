@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
+import 'package:exchats/core/widgets/appbar_icon_button.dart';
 import '../../../../../../core/di/locator.dart';
 import '../../../../../../features/user/presentation/store/user_store.dart';
 import '../../../../../../features/auth/presentation/store/auth_store.dart';

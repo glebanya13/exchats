@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:exchats/ui/shared_widgets/safe_svg_icon.dart';
-import 'package:exchats/ui/screens/home/profile/business_account_screen.dart';
-import 'package:exchats/ui/screens/home/profile/devices_screen.dart';
-import 'package:exchats/ui/screens/home/profile/folders_screen.dart';
-import 'package:exchats/ui/screens/home/profile/my_profile_screen.dart';
-import 'package:exchats/ui/screens/home/profile/notifications_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy_screen.dart';
-import '../../../../core/di/locator.dart';
-import '../../../../features/user/presentation/store/user_store.dart';
+import 'package:exchats/core/widgets/safe_svg_icon.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/business_account_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/devices_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/folders_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/my_profile_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/notifications_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy_screen.dart';
+import 'package:exchats/core/di/locator.dart';
+import 'package:exchats/features/user/presentation/store/user_store.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
+import 'package:exchats/core/widgets/appbar_icon_button.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../../core/di/locator.dart';
 import '../../store/chat_store.dart';
 import '../../../../../features/auth/presentation/store/auth_store.dart';
 import '../../../domain/entity/chat_entity.dart';
 import 'package:mobx/mobx.dart';
-import '../../../../../ui/screens/home/new_chat/new_chat_screen.dart';
+import '../new_chat/new_chat_screen.dart';
 import 'strings.dart';
 import 'widgets/chat_loading_list_item.dart';
 import 'widgets/chat_list_item.dart';

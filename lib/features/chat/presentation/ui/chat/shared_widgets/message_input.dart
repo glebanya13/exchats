@@ -3,7 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import '../../../../domain/entity/message_entity.dart';
 import '../../../../../../features/user/domain/entity/user_entity.dart';
-import 'package:exchats/ui/icons/app_icons.dart';
+import 'package:exchats/core/icons/app_icons.dart';
 
 class MessageInput extends StatefulWidget {
   final MessageEntity? replyToMessage;

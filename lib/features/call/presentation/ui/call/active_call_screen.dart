@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
-import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
+import 'package:exchats/core/widgets/rounded_avatar.dart';
 import 'widgets/connection_request_dialog.dart';
 
 class ActiveCallScreen extends StatefulWidget {

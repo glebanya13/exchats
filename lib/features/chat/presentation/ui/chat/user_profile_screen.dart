@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
+import 'package:exchats/core/widgets/appbar_icon_button.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;

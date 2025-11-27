@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/create_password_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/create_password_screen.dart';
 
 class EnablePasswordScreen extends StatelessWidget {
   const EnablePasswordScreen({Key? key}) : super(key: key);

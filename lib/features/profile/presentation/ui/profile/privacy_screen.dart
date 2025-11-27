@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/black_list_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/calls_privacy_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/enable_password_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/forwarding_privacy_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/last_seen_privacy_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/messages_privacy_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/password_settings_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/phone_number_privacy_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/profile_photos_privacy_screen.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/voice_messages_privacy_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/black_list_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/calls_privacy_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/enable_password_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/forwarding_privacy_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/last_seen_privacy_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/messages_privacy_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/password_settings_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/phone_number_privacy_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/profile_photos_privacy_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/voice_messages_privacy_screen.dart';
 
 class PrivacyScreen extends StatefulWidget {
   const PrivacyScreen({Key? key}) : super(key: key);

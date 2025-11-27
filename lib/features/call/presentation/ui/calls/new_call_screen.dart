@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
+import 'package:exchats/core/widgets/appbar_icon_button.dart';
 
 import 'strings.dart';
 import 'widgets/call_link_dialog.dart';

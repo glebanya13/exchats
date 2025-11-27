@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../../core/di/locator.dart';
-import 'package:exchats/ui/shared_widgets/safe_svg_icon.dart';
-import '../../../features/user/presentation/store/user_store.dart';
-import '../../../features/auth/presentation/store/auth_store.dart';
+import 'package:exchats/core/di/locator.dart';
+import 'package:exchats/core/widgets/safe_svg_icon.dart';
+import 'package:exchats/features/user/presentation/store/user_store.dart';
+import 'package:exchats/features/auth/presentation/store/auth_store.dart';
 
-import '../../../features/call/presentation/ui/calls/calls_screen.dart';
-import '../../../features/chat/presentation/ui/chats/chats_screen.dart';
-import 'contacts/contacts_screen.dart';
-import 'profile/profile_screen.dart';
+import 'package:exchats/features/call/presentation/ui/calls/calls_screen.dart';
+import 'package:exchats/features/chat/presentation/ui/chats/chats_screen.dart';
+import 'package:exchats/features/contacts/presentation/ui/contacts/contacts_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);

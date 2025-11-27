@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
+import 'package:exchats/core/widgets/rounded_avatar.dart';
 
 class ChatLoadingListItem extends StatelessWidget {
   @override

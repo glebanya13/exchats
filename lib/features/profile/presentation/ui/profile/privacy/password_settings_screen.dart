@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:exchats/ui/screens/home/profile/privacy/create_password_screen.dart';
+import 'package:exchats/features/profile/presentation/ui/profile/privacy/create_password_screen.dart';
 
 class PasswordSettingsScreen extends StatefulWidget {
   const PasswordSettingsScreen({Key? key}) : super(key: key);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
+import 'package:exchats/core/widgets/appbar_icon_button.dart';
 
 class ArchiveScreen extends StatelessWidget {
   const ArchiveScreen({Key? key}) : super(key: key);

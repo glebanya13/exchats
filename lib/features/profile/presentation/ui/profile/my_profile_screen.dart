@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/di/locator.dart';
-import '../../../../features/user/presentation/store/user_store.dart';
+import 'package:exchats/core/di/locator.dart';
+import 'package:exchats/features/user/presentation/store/user_store.dart';
 
 class MyProfileScreen extends StatelessWidget {
   const MyProfileScreen({Key? key}) : super(key: key);

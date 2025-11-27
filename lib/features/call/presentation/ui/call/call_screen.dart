@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
-import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
+import 'package:exchats/core/widgets/appbar_icon_button.dart';
+import 'package:exchats/core/widgets/rounded_avatar.dart';
 
 import 'strings.dart';
 import 'active_call_screen.dart';

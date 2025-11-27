@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:exchats/ui/icons/app_icons.dart';
+import 'package:exchats/core/icons/app_icons.dart';
 import '../shared_widgets/message_input.dart';
-import 'package:exchats/ui/shared_widgets/appbar_icon_button.dart';
-import 'package:exchats/ui/shared_widgets/rounded_avatar.dart';
+import 'package:exchats/core/widgets/appbar_icon_button.dart';
+import 'package:exchats/core/widgets/rounded_avatar.dart';
 import '../../../../../../core/di/locator.dart';
 import '../../../store/message_store.dart';
 
