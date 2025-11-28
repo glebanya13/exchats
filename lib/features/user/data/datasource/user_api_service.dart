@@ -1,8 +1,10 @@
 import 'package:exchats/core/api/api_provider.dart';
 import 'package:exchats/features/user/data/dto/update_user_request_dto.dart';
 import 'package:exchats/features/user/data/dto/user_dto.dart';
+import 'package:injectable/injectable.dart';
 
-class UserApiService {
+@lazySingleton
+final class UserApiService {
   final ApiProvider _apiProvider;
 
   UserApiService(this._apiProvider);

@@ -1,10 +1,13 @@
 import 'dart:math';
+import 'package:injectable/injectable.dart';
+
 import 'api_service.dart';
 import 'mock_data.dart';
 import '../../features/user/data/dto/user_dto.dart';
 import '../../features/chat/data/dto/chat_dto.dart';
 import '../../features/chat/data/dto/message_dto.dart';
 
+@Singleton(as: ApiService)
 class MockApiService implements ApiService {
   final Random _random = Random();
 

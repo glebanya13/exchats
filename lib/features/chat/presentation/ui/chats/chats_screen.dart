@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../../../core/di/locator.dart';
+import '../../../../../core/di/locator.dart';
 import '../../../../../../core/constants/app_colors.dart';
 import '../../store/chat_store.dart';
 import '../../../../../features/auth/presentation/store/auth_store.dart';

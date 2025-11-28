@@ -1,44 +1,16 @@
-class AuthTokensDto {
-  final String accessToken;
-  final String refreshToken;
-  final int? expiresIn;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  AuthTokensDto({
-    required this.accessToken,
-    required this.refreshToken,
-    this.expiresIn,
-  });
+part 'auth_tokens_dto.freezed.dart';
+part 'auth_tokens_dto.g.dart';
 
-  factory AuthTokensDto.fromJson(Map<String, dynamic>? json) {
-    if (json == null) {
-      throw const FormatException('Empty auth response');
-    }
-    final normalized = _unwrap(json);
-    final access = (normalized['access_token'] ??
-            normalized['token'] ??
-            normalized['accessToken']) as String? ??
-        '';
-    final refresh = (normalized['refresh_token'] ??
-            normalized['refreshToken'] ??
-            normalized['refresh']) as String? ??
-        '';
-    final expires = normalized['expires_in'] as int?;
-    if (access.isEmpty) {
-      throw FormatException(
-          'Access token not found in response. Response keys: ${normalized.keys.join(", ")}');
-    }
-    return AuthTokensDto(
-      accessToken: access,
-      refreshToken: refresh.isNotEmpty ? refresh : '',
-      expiresIn: expires,
-    );
-  }
+@Freezed(copyWith: false, equal: false, toJson: false)
+abstract class AuthTokensDto with _$AuthTokensDto {
+  const factory AuthTokensDto({
+    @Default('') String accessToken,
+    @Default('') String refreshToken,
+    int? expiresIn,
+  }) = _AuthTokensDto;
 
-  static Map<String, dynamic> _unwrap(Map<String, dynamic> source) {
-    final data = source['data'];
-    if (data is Map<String, dynamic>) {
-      return data;
-    }
-    return source;
-  }
+  factory AuthTokensDto.fromJson(Map<String, dynamic> json) =>
+      _$AuthTokensDtoFromJson(json);
 }

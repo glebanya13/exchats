@@ -1,7 +1,10 @@
+import 'package:injectable/injectable.dart';
+
 import '../repository/auth_repository.dart';
 import '../../../../features/user/domain/entity/user_entity.dart';
 
-class AuthUseCase {
+@lazySingleton
+final class AuthUseCase {
   final AuthRepository _authRepository;
 
   AuthUseCase(this._authRepository);

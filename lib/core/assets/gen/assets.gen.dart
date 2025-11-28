@@ -47,16 +47,16 @@ class $AssetsAuthGen {
 
   /// List of all assets
   List<dynamic> get values => [
-        acceptPng,
-        acceptSvg,
-        apple,
-        errorPng,
-        errorSvg,
-        google,
-        logo,
-        russianFederation,
-        tgWhite
-      ];
+    acceptPng,
+    acceptSvg,
+    apple,
+    errorPng,
+    errorSvg,
+    google,
+    logo,
+    russianFederation,
+    tgWhite,
+  ];
 }
 
 class $AssetsBottomGen {
@@ -82,8 +82,14 @@ class $AssetsBottomGen {
   SvgGenImage get users => const SvgGenImage('assets/bottom/users.svg');
 
   /// List of all assets
-  List<SvgGenImage> get values =>
-      [archive, call, chatButton, message, profile, users];
+  List<SvgGenImage> get values => [
+    archive,
+    call,
+    chatButton,
+    message,
+    profile,
+    users,
+  ];
 }
 
 class $AssetsIconsGen {
@@ -197,40 +203,40 @@ class $AssetsIconsGen {
 
   /// List of all assets
   List<SvgGenImage> get values => [
-        addAccount,
-        addPhoto,
-        apple,
-        arrowLowerLeft,
-        arrowUpperRight,
-        bell,
-        call,
-        callAlt,
-        chat,
-        chatSupport,
-        clock,
-        deleteUser,
-        edit,
-        google,
-        happy,
-        keyhole,
-        lock,
-        logout,
-        mic,
-        mobile,
-        mute,
-        noBell,
-        noCall,
-        officeBag,
-        profile,
-        robot,
-        rss,
-        shareChat,
-        telegram,
-        uploadChat,
-        users,
-        videoCamera,
-        volumeUp
-      ];
+    addAccount,
+    addPhoto,
+    apple,
+    arrowLowerLeft,
+    arrowUpperRight,
+    bell,
+    call,
+    callAlt,
+    chat,
+    chatSupport,
+    clock,
+    deleteUser,
+    edit,
+    google,
+    happy,
+    keyhole,
+    lock,
+    logout,
+    mic,
+    mobile,
+    mute,
+    noBell,
+    noCall,
+    officeBag,
+    profile,
+    robot,
+    rss,
+    shareChat,
+    telegram,
+    uploadChat,
+    users,
+    videoCamera,
+    volumeUp,
+  ];
 }
 
 class $AssetsProfileGen {
@@ -292,22 +298,22 @@ class $AssetsProfileGen {
 
   /// List of all assets
   List<dynamic> get values => [
-        addAccount,
-        addPhoto,
-        artsyom,
-        blackList,
-        bussinesSvg,
-        devices,
-        devicesBlue,
-        folders,
-        logout,
-        notifications,
-        password,
-        plus,
-        profile,
-        security,
-        user
-      ];
+    addAccount,
+    addPhoto,
+    artsyom,
+    blackList,
+    bussinesSvg,
+    devices,
+    devicesBlue,
+    folders,
+    logout,
+    notifications,
+    password,
+    plus,
+    profile,
+    security,
+    user,
+  ];
 }
 
 class $AssetsProfileBussinesGen {
@@ -414,15 +420,8 @@ class AssetGenImage {
     );
   }
 
-  ImageProvider provider({
-    AssetBundle? bundle,
-    String? package,
-  }) {
-    return AssetImage(
-      _assetName,
-      bundle: bundle,
-      package: package,
-    );
+  ImageProvider provider({AssetBundle? bundle, String? package}) {
+    return AssetImage(_assetName, bundle: bundle, package: package);
   }
 
   String get path => _assetName;
@@ -443,17 +442,11 @@ class AssetGenImageAnimation {
 }
 
 class SvgGenImage {
-  const SvgGenImage(
-    this._assetName, {
-    this.size,
-    this.flavors = const {},
-  }) : _isVecFormat = false;
+  const SvgGenImage(this._assetName, {this.size, this.flavors = const {}})
+    : _isVecFormat = false;
 
-  const SvgGenImage.vec(
-    this._assetName, {
-    this.size,
-    this.flavors = const {},
-  }) : _isVecFormat = true;
+  const SvgGenImage.vec(this._assetName, {this.size, this.flavors = const {}})
+    : _isVecFormat = true;
 
   final String _assetName;
   final Size? size;
@@ -509,7 +502,8 @@ class SvgGenImage {
       placeholderBuilder: placeholderBuilder,
       semanticsLabel: semanticsLabel,
       excludeFromSemantics: excludeFromSemantics,
-      colorFilter: colorFilter ??
+      colorFilter:
+          colorFilter ??
           (color == null ? null : ColorFilter.mode(color, colorBlendMode)),
       clipBehavior: clipBehavior,
       cacheColorFilter: cacheColorFilter,

@@ -1,21 +1,18 @@
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:exchats/core/api/api_provider.dart';
+import 'package:exchats/core/services/secure_storage/token_repository.dart';
+import 'package:exchats/core/services/storage/local_user_storage.dart';
+import 'package:injectable/injectable.dart';
 import 'package:exchats/features/auth/data/datasource/auth_api_service.dart';
 import '../../domain/repository/auth_repository.dart';
 import '../../../../features/user/domain/entity/user_entity.dart';
 import '../../../../features/user/data/mapper/user_mapper.dart';
+import '../mappers/auth_tokens_mapper.dart';
 
-class AuthRepositoryImpl implements AuthRepository {
+@LazySingleton(as: AuthRepository)
+final class AuthRepositoryImpl implements AuthRepository {
   final AuthApiService _authApiService;
-  final ApiProvider _apiProvider;
-  final SharedPreferences _prefs;
 
-  AuthRepositoryImpl(
-    this._authApiService,
-    this._apiProvider,
-    this._prefs,
-  );
+  const AuthRepositoryImpl(this._authApiService);
 
   @override
   Future<void> sendVerificationCode(String phoneNumber) {
@@ -27,10 +24,11 @@ class AuthRepositoryImpl implements AuthRepository {
     required String phoneNumber,
     required String code,
   }) async {
-    final tokens = await _authApiService.verifyCode(
+    final response = await _authApiService.verifyCode(
       phoneNumber: phoneNumber,
       code: code,
     );
+    final tokens = AuthTokensMapper.toEntity(from: response);
     if (tokens.accessToken.isEmpty) {
       throw Exception('Не удалось получить access token');
     }
@@ -39,15 +37,13 @@ class AuthRepositoryImpl implements AuthRepository {
       throw Exception('Не удалось получить refresh token');
     }
 
-    await _apiProvider.setTokens(
+    TokenRepository.saveTokens(
       accessToken: tokens.accessToken,
       refreshToken: refreshToken,
     );
-    await _prefs.setString('access_token', tokens.accessToken);
-    await _prefs.setString('refresh_token', refreshToken);
 
     final userDto = await _authApiService.getCurrentUser();
-    await _prefs.setString('current_user_id', userDto.id);
+    LocalUserStorage.currentUserId = userDto.id;
     return UserMapper.toEntity(userDto);
   }
 
@@ -59,14 +55,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity?> getCurrentUser() async {
-    final accessToken = _prefs.getString('access_token');
-    if (accessToken == null || accessToken.isEmpty) {
-      await _clearStoredSession();
-      return null;
-    }
     try {
       final userDto = await _authApiService.getCurrentUser();
-      await _prefs.setString('current_user_id', userDto.id);
+      LocalUserStorage.currentUserId = userDto.id;
       return UserMapper.toEntity(userDto);
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
@@ -78,9 +69,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   Future<void> _clearStoredSession() async {
-    await _apiProvider.clearTokens();
-    await _prefs.remove('access_token');
-    await _prefs.remove('refresh_token');
-    await _prefs.remove('current_user_id');
+    await TokenRepository.deleteAll();
+    LocalUserStorage.currentUserId = null;
   }
 }

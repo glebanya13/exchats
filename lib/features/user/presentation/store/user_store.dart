@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import '../../domain/usecase/user_usecase.dart';
 import '../../domain/entity/user_entity.dart';
@@ -6,7 +7,8 @@ import '../../../../core/util/phone_number_mask.dart';
 
 part 'user_store.g.dart';
 
-class UserStore = _UserStore with _$UserStore;
+@lazySingleton
+final class UserStore = _UserStore with _$UserStore;
 
 abstract class _UserStore with Store {
   final UserUseCase _userUseCase;

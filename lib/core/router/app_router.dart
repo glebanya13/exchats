@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import '../../../../core/di/locator.dart';
+import '../di/locator.dart';
 import '../../features/auth/presentation/store/auth_store.dart';
 import '../../features/auth/presentation/ui/auth/auth_screen.dart';
 import '../../features/auth/presentation/ui/auth/login/login_screen.dart';
@@ -28,15 +28,15 @@ class AppRouter {
     redirect: (context, state) {
       final authStore = locator<AuthStore>();
       final isAuthRoute = state.matchedLocation.startsWith('/auth');
-      
+
       if (!authStore.isAuthenticated && !isAuthRoute) {
         return '/auth';
       }
-      
+
       if (authStore.isAuthenticated && isAuthRoute) {
         return '/';
       }
-      
+
       return null;
     },
     routes: [
@@ -53,7 +53,8 @@ class AppRouter {
             path: 'verification',
             name: 'verification',
             builder: (context, state) {
-              final phoneNumber = state.uri.queryParameters['phoneNumber'] ?? '';
+              final phoneNumber =
+                  state.uri.queryParameters['phoneNumber'] ?? '';
               return VerificationScreen(phoneNumber: phoneNumber);
             },
           ),
@@ -98,8 +99,10 @@ class AppRouter {
             builder: (context, state) {
               final userId = state.uri.queryParameters['userId'];
               final userName = state.uri.queryParameters['userName'];
-              final isIncoming = state.uri.queryParameters['isIncoming'] == 'true';
-              final isVideoCall = state.uri.queryParameters['isVideoCall'] == 'true';
+              final isIncoming =
+                  state.uri.queryParameters['isIncoming'] == 'true';
+              final isVideoCall =
+                  state.uri.queryParameters['isVideoCall'] == 'true';
               return CallScreen(
                 userId: userId,
                 userName: userName,
@@ -144,7 +147,8 @@ class AppRouter {
             builder: (context, state) {
               final userId = state.uri.queryParameters['userId'] ?? '';
               final userName = state.uri.queryParameters['userName'] ?? '';
-              final userStatus = state.uri.queryParameters['userStatus'] ?? 'offline';
+              final userStatus =
+                  state.uri.queryParameters['userStatus'] ?? 'offline';
               return UserProfileScreen(
                 userId: userId,
                 userName: userName,
@@ -157,7 +161,8 @@ class AppRouter {
             name: 'group_profile',
             builder: (context, state) {
               final groupId = state.uri.queryParameters['groupId'] ?? '';
-              final groupName = state.uri.queryParameters['groupName'] ?? 'Группа';
+              final groupName =
+                  state.uri.queryParameters['groupName'] ?? 'Группа';
               return GroupProfileScreen(
                 groupId: groupId,
                 groupName: groupName,
@@ -170,7 +175,8 @@ class AppRouter {
             builder: (context, state) {
               final userId = state.uri.queryParameters['userId'] ?? '';
               final userName = state.uri.queryParameters['userName'] ?? '';
-              final isVideoCall = state.uri.queryParameters['isVideoCall'] == 'true';
+              final isVideoCall =
+                  state.uri.queryParameters['isVideoCall'] == 'true';
               return ActiveCallScreen(
                 userId: userId,
                 userName: userName,

@@ -1,10 +1,12 @@
+import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import '../../domain/usecase/auth_usecase.dart';
 import '../../../../features/user/domain/entity/user_entity.dart';
 
 part 'auth_store.g.dart';
 
-class AuthStore = _AuthStore with _$AuthStore;
+@lazySingleton
+final class AuthStore = _AuthStore with _$AuthStore;
 
 abstract class _AuthStore with Store {
   final AuthUseCase _authUseCase;

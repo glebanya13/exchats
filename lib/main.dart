@@ -1,3 +1,4 @@
+import 'package:exchats/core/di/init.dart';
 import 'package:flutter/material.dart';
 import 'core/di/locator.dart';
 import 'core/router/app_router.dart';
@@ -6,16 +7,16 @@ import 'features/auth/presentation/store/auth_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await setupLocator();
+  await initDI();
 
   final authStore = locator<AuthStore>();
   await authStore.checkAuthStatus();
 
-  runApp(const TelegramCloneApp());
+  runApp(const ExChatsApp());
 }
 
-class TelegramCloneApp extends StatelessWidget {
-  const TelegramCloneApp({super.key});
+class ExChatsApp extends StatelessWidget {
+  const ExChatsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +38,7 @@ class TelegramCloneApp extends StatelessWidget {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
-        ),
+        style: TextButton.styleFrom(foregroundColor: AppColors.primary),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -50,7 +49,7 @@ class TelegramCloneApp extends StatelessWidget {
     );
 
     return MaterialApp.router(
-      title: 'Telegram',
+      title: 'ExChats',
       theme: theme,
       routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,

@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:injectable/injectable.dart';
+
 import '../repository/user_repository.dart';
 import '../entity/user_entity.dart';
 
-class UserUseCase {
+@lazySingleton
+final class UserUseCase {
   final UserRepository _userRepository;
 
   UserUseCase(this._userRepository);
