@@ -1,3 +1,4 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:exchats/core/di/init.dart';
 import 'package:exchats/generated/locale_loader.g.dart';
@@ -66,7 +67,10 @@ class ExChatsApp extends StatelessWidget {
       theme: theme,
       routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: localization?.delegates,
+      localizationsDelegates: [
+        ...localization?.delegates ?? [],
+        CountryLocalizations.delegate,
+      ],
       supportedLocales: localization?.supportedLocales ?? const [Locale('ru')],
       locale: localization?.locale,
     );
