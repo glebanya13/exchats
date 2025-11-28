@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:exchats/core/di/init.dart';
+import 'package:exchats/generated/locale_loader.g.dart';
 import 'package:flutter/material.dart';
 import 'core/di/locator.dart';
 import 'core/router/app_router.dart';
@@ -12,7 +14,16 @@ void main() async {
   final authStore = locator<AuthStore>();
   await authStore.checkAuthStatus();
 
-  runApp(const ExChatsApp());
+  runApp(
+    EasyLocalization(
+      ignorePluralRules: false,
+      supportedLocales: const [Locale('ru')],
+      path: 'assets/lang',
+      fallbackLocale: const Locale('ru'),
+      assetLoader: const CodegenLoader(),
+      child: const ExChatsApp(),
+    ),
+  );
 }
 
 class ExChatsApp extends StatelessWidget {
@@ -20,6 +31,8 @@ class ExChatsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = EasyLocalization.of(context);
+
     final theme = ThemeData(
       useMaterial3: false,
       colorScheme: ColorScheme.fromSeed(
@@ -53,6 +66,9 @@ class ExChatsApp extends StatelessWidget {
       theme: theme,
       routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: localization?.delegates,
+      supportedLocales: localization?.supportedLocales ?? const [Locale('ru')],
+      locale: localization?.locale,
     );
   }
 }

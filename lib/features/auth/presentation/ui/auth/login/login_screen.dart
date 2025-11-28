@@ -1,3 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:exchats/generated/locale_keys.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,14 +9,14 @@ import 'package:exchats/core/di/locator.dart';
 import 'package:exchats/core/constants/app_colors.dart';
 import 'package:exchats/features/auth/presentation/store/auth_store.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+final class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+final class _LoginScreenState extends State<LoginScreen> {
   int _selectedTab = 0;
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -55,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 borderRadius: BorderRadius.circular(8.0),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10.0,
                     offset: Offset(0, 4),
                   ),
@@ -82,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24.0),
                   Text(
-                    'Авторизация',
+                    LocaleKeys.auth_login_title.tr(),
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -153,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    'Телефон',
+                    LocaleKeys.auth_login_phone.tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: _selectedTab == 0
@@ -187,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    'Почта',
+                    LocaleKeys.auth_login_email.tr(),
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: _selectedTab == 1
@@ -322,8 +324,8 @@ class _LoginScreenState extends State<LoginScreen> {
       favorite: const ['RU', 'UA', 'KZ', 'BY'],
       countryListTheme: CountryListThemeData(
         borderRadius: BorderRadius.circular(12),
-        inputDecoration: const InputDecoration(
-          hintText: 'Поиск страны',
+        inputDecoration: InputDecoration(
+          hintText: LocaleKeys.auth_login_search_country.tr(),
           prefixIcon: Icon(Icons.search),
         ),
       ),
@@ -344,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
         color: Colors.black,
       ),
       decoration: InputDecoration(
-        hintText: 'Введите почту',
+        hintText: LocaleKeys.auth_login_enter_email.tr(),
         hintStyle: TextStyle(
           color: Colors.grey[400],
           fontSize: 16.0,
@@ -385,7 +387,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _isEmailValid = value.contains('@') && value.contains('.');
           if (value.isNotEmpty && !_isEmailValid) {
-            _emailError = 'Неверный формат email';
+            _emailError = LocaleKeys.auth_login_invalid_email.tr();
           } else {
             _emailError = null;
           }
@@ -419,13 +421,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   } catch (e) {
                     if (!mounted) return;
                     setState(() {
-                      _phoneError =
-                          'Не удалось отправить код. Попробуйте позже.';
+                      _phoneError = LocaleKeys.auth_login_error_send_code.tr();
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content:
-                            Text('Ошибка отправки кода. Повторите попытку.'),
+                      SnackBar(
+                        content: Text(LocaleKeys
+                            .auth_login_error_send_code_try_again
+                            .tr()),
                       ),
                     );
                   } finally {
@@ -460,7 +462,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               )
             : Text(
-                'Далее',
+                LocaleKeys.auth_login_button_title.tr(),
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.w500,
@@ -474,7 +476,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       children: [
         Text(
-          'Или войти с помощью',
+          LocaleKeys.auth_login_or_login_with.tr(),
           style: TextStyle(
             fontSize: 14.0,
             color: Colors.grey[600],

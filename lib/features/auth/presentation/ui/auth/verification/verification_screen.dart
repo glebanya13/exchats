@@ -1,3 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:exchats/generated/locale_keys.g.dart';
 import 'package:flutter/material.dart';
 import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter/services.dart';
@@ -5,19 +7,19 @@ import 'package:go_router/go_router.dart';
 import '../../../../../../core/di/locator.dart';
 import '../../../store/auth_store.dart';
 
-class VerificationScreen extends StatefulWidget {
+final class VerificationScreen extends StatefulWidget {
   final String phoneNumber;
 
   const VerificationScreen({
-    Key? key,
+    super.key,
     required this.phoneNumber,
-  }) : super(key: key);
+  });
 
   @override
-  _VerificationScreenState createState() => _VerificationScreenState();
+  State<VerificationScreen> createState() => _VerificationScreenState();
 }
 
-class _VerificationScreenState extends State<VerificationScreen> {
+final class _VerificationScreenState extends State<VerificationScreen> {
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
@@ -27,15 +29,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      for (int i = 0; i < 6; i++) {
-        _controllers[i].text = '1';
-      }
-      setState(() {
-        _isCodeComplete = true;
-      });
-    });
   }
 
   @override
@@ -66,7 +59,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 borderRadius: BorderRadius.circular(8.0),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10.0,
                     offset: Offset(0, 4),
                   ),
@@ -93,7 +86,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   ),
                   const SizedBox(height: 24.0),
                   Text(
-                    'Код верификации',
+                    LocaleKeys.auth_verification_title.tr(),
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -116,7 +109,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           child: Text(
                             _errorMessage != null
                                 ? _errorMessage!
-                                : 'Введите 6-ти значный код.',
+                                : LocaleKeys.auth_verification_enter_code.tr(),
                             style: TextStyle(
                               fontSize: 14.0,
                               color: _errorMessage != null
@@ -175,7 +168,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               counterText: '',
               filled: true,
               fillColor: _errorMessage != null
-                  ? Colors.red.withOpacity(0.1)
+                  ? Colors.red.withValues(alpha: 0.1)
                   : Colors.white,
               contentPadding: EdgeInsets.zero,
               border: OutlineInputBorder(
@@ -247,7 +240,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
       } catch (e) {
         if (!mounted) return;
         setState(() {
-          _errorMessage = 'Неверный или просроченный код';
+          _errorMessage = LocaleKeys.auth_verification_invalid_code.tr();
         });
       }
     } else {
@@ -281,7 +274,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
           elevation: 0,
         ),
         child: Text(
-          'Вход',
+          LocaleKeys.auth_verification_button_title.tr(),
           style: TextStyle(
             fontSize: 16.0,
             fontWeight: FontWeight.w500,
@@ -295,7 +288,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     return GestureDetector(
       onTap: () {},
       child: Text(
-        'Условия публичной оферты',
+        LocaleKeys.auth_verification_terms_of_service.tr(),
         style: TextStyle(
           fontSize: 12.0,
           color: Colors.grey[600],
