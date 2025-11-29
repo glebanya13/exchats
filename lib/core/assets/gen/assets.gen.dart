@@ -239,6 +239,16 @@ class $AssetsIconsGen {
   ];
 }
 
+class $AssetsLangGen {
+  const $AssetsLangGen();
+
+  /// File path: assets/lang/ru.json
+  String get ru => 'assets/lang/ru.json';
+
+  /// List of all assets
+  List<String> get values => [ru];
+}
+
 class $AssetsProfileGen {
   const $AssetsProfileGen();
 
@@ -350,6 +360,7 @@ class Assets {
   static const $AssetsAuthGen auth = $AssetsAuthGen();
   static const $AssetsBottomGen bottom = $AssetsBottomGen();
   static const $AssetsIconsGen icons = $AssetsIconsGen();
+  static const $AssetsLangGen lang = $AssetsLangGen();
   static const $AssetsProfileGen profile = $AssetsProfileGen();
 }
 

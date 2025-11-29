@@ -4,9 +4,9 @@ import '../dto/dto.dart';
 abstract final class AuthTokensMapper {
   static AuthTokensEntity toEntity({required AuthTokensDto from}) {
     return AuthTokensEntity(
-      accessToken: from.accessToken,
-      refreshToken: from.refreshToken,
-      expiresIn: from.expiresIn,
+      accessToken: from.data.accessToken,
+      refreshToken: from.data.refreshToken,
+      expiresIn: from.data.expiresIn,
     );
   }
 }
