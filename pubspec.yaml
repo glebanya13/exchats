@@ -26,6 +26,8 @@ dependencies:
   country_picker: ^2.0.21
   cupertino_icons: ^1.0.8
   easy_localization: ^3.0.8
+  pinput: ^6.0.1
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:
