@@ -1,10 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:exchats/core/assets/gen/assets.gen.dart';
+import 'package:exchats/core/assets/gen/fonts.gen.dart';
 import 'package:exchats/features/auth/presentation/store/login_store.dart';
 import 'package:exchats/generated/locale_keys.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:exchats/core/di/locator.dart';
@@ -19,16 +20,22 @@ final class LoginScreen extends StatefulWidget {
 
 final class _LoginScreenState extends State<LoginScreen> {
   late LoginStore store;
+  late TextEditingController phoneController;
+  late TextEditingController emailController;
 
   @override
   void initState() {
     super.initState();
     store = locator<LoginStore>();
     store.setupValidations();
+    phoneController = TextEditingController();
+    emailController = TextEditingController();
   }
 
   @override
   void dispose() {
+    phoneController.dispose();
+    emailController.dispose();
     store.dispose();
     super.dispose();
   }
@@ -45,70 +52,67 @@ final class _LoginScreenState extends State<LoginScreen> {
             builder: (context) {
               return SingleChildScrollView(
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                  padding: const EdgeInsets.all(24.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 12.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 20.0,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10.0,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
+                    color: AppColors.subSurface,
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(color: AppColors.borderSecondary),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.asset(
-                        'assets/auth/logo.png',
-                        width: 64.0,
-                        height: 64.0,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: 64.0,
-                            height: 64.0,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.image, size: 32.0),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24.0),
-                      Text(
-                        LocaleKeys.auth_login_title.tr(),
-                        style: TextStyle(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                      Assets.auth.logo.image(width: 64.0, height: 64.0),
+                      const SizedBox(height: 12.0),
+                      Container(
+                        padding: const EdgeInsets.all(12.0),
+                        decoration: BoxDecoration(
+                          color: AppColors.onPrimary,
+                          borderRadius: BorderRadius.circular(12.0),
                         ),
-                      ),
-                      const SizedBox(height: 32.0),
-                      _buildTabs(theme),
-                      const SizedBox(height: 24.0),
-                      store.selectedTab == 0
-                          ? _buildPhoneInput(theme)
-                          : _buildEmailInput(theme),
-                      if (store.hasError)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0, left: 0),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              store.error!,
+                        child: Column(
+                          children: [
+                            Text(
+                              LocaleKeys.auth_login_title.tr(),
                               style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 12.0,
+                                fontFamily: FontFamily.inter,
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.onSurface,
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 12.0),
+                            _buildTabs(),
+                            const SizedBox(height: 14.0),
+                            store.selectedTab == 0
+                                ? _buildPhoneInput(theme)
+                                : _buildEmailInput(theme),
+                            if (store.hasError)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 8.0,
+                                  left: 0,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    store.error!,
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 12.0),
+                            _buildNextButton(theme),
+                          ],
                         ),
-                      const SizedBox(height: 24.0),
-                      _buildNextButton(theme),
-                      const SizedBox(height: 24.0),
+                      ),
+                      const SizedBox(height: 12.0),
                       _buildSocialLogin(theme),
                     ],
                   ),
@@ -121,77 +125,44 @@ final class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTabs(ThemeData theme) {
+  Widget _buildTabs() {
+    Widget tab(String title, int index) {
+      final selected = store.selectedTab == index;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () => store.setSelectedTab(index),
+          child: Container(
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? AppColors.onPrimary : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              title,
+              style: TextStyle(
+                fontFamily: FontFamily.inter,
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.onSurface,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Container(
-      height: 44.0,
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(8.0),
+        color: AppColors.gray2.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => store.setSelectedTab(0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: store.selectedTab == 0
-                      ? Colors.white
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8.0),
-                    bottomLeft: Radius.circular(8.0),
-                  ),
-                  border: store.selectedTab == 0
-                      ? Border.all(color: Colors.grey[300]!, width: 1.0)
-                      : null,
-                ),
-                child: Center(
-                  child: Text(
-                    LocaleKeys.auth_login_phone.tr(),
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: store.selectedTab == 0
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => store.setSelectedTab(1),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: store.selectedTab == 1
-                      ? Colors.white
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(8.0),
-                    bottomRight: Radius.circular(8.0),
-                  ),
-                  border: store.selectedTab == 1
-                      ? Border.all(color: Colors.grey[300]!, width: 1.0)
-                      : null,
-                ),
-                child: Center(
-                  child: Text(
-                    LocaleKeys.auth_login_email.tr(),
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: store.selectedTab == 1
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          tab(LocaleKeys.auth_login_phone.tr(), 0),
+          const SizedBox(width: 6),
+          tab(LocaleKeys.auth_login_email.tr(), 1),
         ],
       ),
     );
@@ -200,6 +171,7 @@ final class _LoginScreenState extends State<LoginScreen> {
   Widget _buildPhoneInput(ThemeData theme) {
     final dialCode = '+${store.selectedCountry.phoneCode}';
     return TextField(
+      controller: phoneController,
       keyboardType: TextInputType.phone,
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,
@@ -235,11 +207,7 @@ final class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.only(right: 16.0),
                 child: Transform.scale(
                   scale: 0.65,
-                  child: SvgPicture.asset(
-                    'assets/auth/accept.svg',
-                    width: 24.0,
-                    height: 24.0,
-                  ),
+                  child: Assets.auth.acceptSvg.svg(),
                 ),
               )
             : store.hasError
@@ -247,11 +215,7 @@ final class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.only(right: 16.0),
                 child: Transform.scale(
                   scale: 0.65,
-                  child: SvgPicture.asset(
-                    'assets/auth/error.svg',
-                    width: 24.0,
-                    height: 24.0,
-                  ),
+                  child: Assets.auth.errorSvg.svg(),
                 ),
               )
             : null,
@@ -313,6 +277,7 @@ final class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildEmailInput(ThemeData theme) {
     return TextField(
+      controller: emailController,
       keyboardType: TextInputType.emailAddress,
       style: TextStyle(fontSize: 16.0, color: Colors.black),
       decoration: InputDecoration(
@@ -415,33 +380,34 @@ final class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           LocaleKeys.auth_login_or_login_with.tr(),
-          style: TextStyle(fontSize: 14.0, color: Colors.grey[600]),
+          style: TextStyle(
+            fontFamily: FontFamily.inter,
+            fontSize: 13.0,
+            color: AppColors.onSubSurface,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 4.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildSocialButton('assets/auth/google.png', false, () {}),
-            const SizedBox(width: 16.0),
-            _buildSocialButton('assets/auth/tg_white.png', true, () {}),
-            const SizedBox(width: 16.0),
-            _buildSocialButton('assets/auth/apple.png', false, () {}),
+            _buildSocialButton(Assets.icons.google.svg(), false, () {}),
+            const SizedBox(width: 12.0),
+            _buildSocialButton(Assets.icons.telegram.svg(), true, () {}),
+            const SizedBox(width: 12.0),
+            _buildSocialButton(Assets.icons.apple.svg(), false, () {}),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildSocialButton(
-    String assetPath,
-    bool isTelegram,
-    VoidCallback onTap,
-  ) {
+  Widget _buildSocialButton(Widget icon, bool isTelegram, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40.0,
-        height: 40.0,
+        width: 32.0,
+        height: 32.0,
         decoration: BoxDecoration(
           gradient: isTelegram
               ? LinearGradient(
@@ -452,20 +418,8 @@ final class _LoginScreenState extends State<LoginScreen> {
               : null,
           color: isTelegram ? null : Colors.white,
           borderRadius: BorderRadius.circular(8.0),
-          border: isTelegram
-              ? null
-              : Border.all(color: Colors.grey[300]!, width: 1.0),
         ),
-        child: Center(
-          child: Image.asset(
-            assetPath,
-            width: 32.0,
-            height: 32.0,
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.image, size: 32.0);
-            },
-          ),
-        ),
+        child: Center(child: icon),
       ),
     );
   }

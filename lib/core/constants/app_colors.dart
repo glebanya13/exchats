@@ -15,7 +15,9 @@ class AppColors {
   static const onSurface = Color(0xFF020C19);
   static const onSubSurface = Color(0xFF62697B);
   static const borderPrimary = Color(0xFFE1E7F1);
+  static const borderSecondary = Color(0xFFD8DDE2);
   static const gray = Color(0xFFA3A9B9);
+  static const gray2 = Color(0xFF767680);
   static const errorPrimary = Color(0xFFEF4444);
 
   static Color? grey(int shade) => Colors.grey[shade];

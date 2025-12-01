@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:exchats/core/assets/gen/assets.gen.dart';
+import 'package:exchats/core/assets/gen/fonts.gen.dart';
 import 'package:exchats/core/di/locator.dart';
 import 'package:exchats/core/widgets/pinput/app_pinput.dart';
 import 'package:exchats/features/auth/presentation/store/verification_store.dart';
@@ -45,96 +47,72 @@ final class _VerificationScreenState extends State<VerificationScreen> {
             builder: (context) {
               return SingleChildScrollView(
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                  padding: const EdgeInsets.all(24.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 12.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 20.0,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10.0,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
+                    color: AppColors.subSurface,
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(color: AppColors.borderSecondary),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.asset(
-                        'assets/auth/logo.png',
-                        width: 64.0,
-                        height: 64.0,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: 64.0,
-                            height: 64.0,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.image, size: 32.0),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24.0),
+                      Assets.auth.logo.image(width: 64.0, height: 64.0),
+                      const SizedBox(height: 12.0),
                       Text(
                         LocaleKeys.auth_verification_title.tr(),
                         style: TextStyle(
+                          fontFamily: FontFamily.inter,
                           fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.onSurface,
                         ),
                       ),
-                      const SizedBox(height: 8.0),
+                      const SizedBox(height: 12.0),
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
+                          color: AppColors.onPrimary,
+                          borderRadius: BorderRadius.circular(12.0),
                         ),
+                        padding: const EdgeInsets.all(12.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                16.0,
-                                16.0,
-                                16.0,
-                                0,
-                              ),
-                              child: Text(
-                                store.hasError
-                                    ? store.error!
-                                    : LocaleKeys.auth_verification_enter_code
-                                          .tr(),
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  color: store.hasError
-                                      ? Colors.red
-                                      : Colors.grey[600],
-                                ),
+                            Text(
+                              store.hasError
+                                  ? store.error!
+                                  : LocaleKeys.auth_verification_enter_code
+                                        .tr(),
+                              style: TextStyle(
+                                fontFamily: FontFamily.inter,
+                                fontSize: 12.0,
+                                color: store.hasError
+                                    ? AppColors.errorPrimary
+                                    : AppColors.onSubSurface,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                children: [
-                                  AppPinput(
-                                    length: 6,
-                                    onChanged: (code) => store.code = code,
-                                    onCompleted: (code) => _sendCode(),
-                                    showError: store.hasError,
-                                  ),
-                                  const SizedBox(height: 32.0),
-                                  _buildLoginButton(theme),
-                                ],
-                              ),
+                            const SizedBox(height: 12.0),
+                            AppPinput(
+                              length: 6,
+                              onChanged: (code) => store.code = code,
+                              onCompleted: (code) => _sendCode(),
+                              showError: store.hasError,
+                            ),
+                            const SizedBox(height: 12.0),
+                            _buildLoginButton(theme),
+                            Column(children: [
+
+
+                              ],
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24.0),
+                      const SizedBox(height: 16.0),
                       _buildTermsLink(theme),
                     ],
                   ),
@@ -194,8 +172,10 @@ final class _VerificationScreenState extends State<VerificationScreen> {
       child: Text(
         LocaleKeys.auth_verification_terms_of_service.tr(),
         style: TextStyle(
-          fontSize: 12.0,
-          color: Colors.grey[600],
+          fontFamily: FontFamily.inter,
+          fontSize: 13.0,
+          color: AppColors.onSubSurface,
+          fontWeight: FontWeight.w500,
           decoration: TextDecoration.underline,
           decorationStyle: TextDecorationStyle.dotted,
         ),
