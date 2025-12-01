@@ -1,0 +1,25 @@
+{
+    "app_name": "ExChats",
+    "auth": {
+        "login": {
+            "title": "Авторизация",
+            "phone": "Телефон",
+            "email": "Почта",
+            "enter_email": "Введите почту",
+            "invalid_email": "Неверный формат email",
+            "button_title": "Далее",
+            "register": "Зарегистрироваться",
+            "search_country": "Поиск страны",
+            "error_send_code": "Не удалось отправить код. Попробуйте позже.",
+            "error_send_code_try_again": "Ошибка отправки кода. Повторите попытку.",
+            "or_login_with": "Или войти с помощью"
+        },
+        "verification": {
+            "title": "Код верификации",
+            "enter_code": "Введите 6-ти значный код.",
+            "button_title": "Вход",
+            "invalid_code": "Неверный или просроченный код",
+            "terms_of_service": "Условия публичной оферты"
+        }
+    }
+}

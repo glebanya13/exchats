@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../../../core/di/locator.dart';
+import '../../../../../core/di/locator.dart';
 import '../../../../../../core/constants/app_colors.dart';
 import '../../store/chat_store.dart';
 import '../../../../../features/auth/presentation/store/auth_store.dart';
@@ -53,113 +53,113 @@ class _ChatsScreenState extends State<ChatsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      body: Container(
-        color: const Color(0xFFF8F9FA),
-        child: SafeArea(
-          bottom: false,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Stack(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        color: const Color(0xFFF8F9FA),
-                        padding:
-                            const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 40.0,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: TextField(
-                                  controller: _searchController,
-                                  decoration: InputDecoration(
-                                    hintText: 'Поиск',
-                                    hintStyle: TextStyle(
-                                      color: theme.textTheme.bodyLarge?.color
-                                          ?.withOpacity(0.5),
-                                      fontSize: 16.0,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.search,
-                                      color: theme.textTheme.bodyLarge?.color
-                                          ?.withOpacity(0.5),
-                                      size: 20.0,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 10.0),
-                                  ),
-                                  style: TextStyle(
-                                    color: theme.textTheme.displayLarge!.color,
+      backgroundColor: AppColors.surface,
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      color: AppColors.subSurface,
+                      padding: const EdgeInsets.fromLTRB(16.0, 56.0, 16.0, 8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 40.0,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: TextField(
+                                controller: _searchController,
+                                decoration: InputDecoration(
+                                  hintText: 'Поиск',
+                                  hintStyle: TextStyle(
+                                    color: theme.textTheme.bodyLarge?.color
+                                        ?.withOpacity(0.5),
                                     fontSize: 16.0,
                                   ),
+                                  prefixIcon: Icon(
+                                    Icons.search,
+                                    color: theme.textTheme.bodyLarge?.color
+                                        ?.withOpacity(0.5),
+                                    size: 20.0,
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                    vertical: 10.0,
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: theme.textTheme.displayLarge!.color,
+                                  fontSize: 16.0,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8.0),
-                            GestureDetector(
-                              onTap: () {
-                                context.push('/new_chat');
-                              },
-                              child: Container(
+                          ),
+                          const SizedBox(width: 8.0),
+                          GestureDetector(
+                            onTap: () {
+                              context.push('/new_chat');
+                            },
+                            child: Container(
+                              width: 40.0,
+                              height: 40.0,
+                              child: SvgPicture.asset(
+                                'assets/bottom/chat-button.svg',
                                 width: 40.0,
                                 height: 40.0,
-                                child: SvgPicture.asset(
-                                  'assets/bottom/chat-button.svg',
-                                  width: 40.0,
-                                  height: 40.0,
-                                ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Container(
-                        color: const Color(0xFFF8F9FA),
-                        height: 48.0,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          children: [
-                            Observer(
-                              builder: (_) {
-                                final allCount = _chatStore.chats.length;
-                                final dialogCount = _chatStore.chats
-                                    .where((c) => c.type == 'dialog')
-                                    .length;
-                                final savedCount = _chatStore.chats
-                                    .where((c) => c.type == 'saved_messages')
-                                    .length;
-                                return Row(
-                                  children: [
-                                    _buildCategoryTab('Все', allCount, 0),
-                                    _buildCategoryTab('Личные', dialogCount, 1),
-                                    _buildCategoryTab(
-                                        'Сохраненные', savedCount, 2),
-                                    _buildCategoryTab('Системные', 0, 3),
-                                  ],
-                                );
-                              },
-                            ),
-                          ],
-                        ),
+                    ),
+                    Container(
+                      color: const Color(0xFFF8F9FA),
+                      height: 48.0,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        children: [
+                          Observer(
+                            builder: (_) {
+                              final allCount = _chatStore.chats.length;
+                              final dialogCount = _chatStore.chats
+                                  .where((c) => c.type == 'dialog')
+                                  .length;
+                              final savedCount = _chatStore.chats
+                                  .where((c) => c.type == 'saved_messages')
+                                  .length;
+                              return Row(
+                                children: [
+                                  _buildCategoryTab('Все', allCount, 0),
+                                  _buildCategoryTab('Личные', dialogCount, 1),
+                                  _buildCategoryTab(
+                                    'Сохраненные',
+                                    savedCount,
+                                    2,
+                                  ),
+                                  _buildCategoryTab('Системные', 0, 3),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: _buildChatList(),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
+                    ),
+                    Expanded(child: _buildChatList()),
+                  ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -199,8 +199,10 @@ class _ChatsScreenState extends State<ChatsScreen> {
             if (count > 0) ...[
               const SizedBox(width: 8.0),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 2.0,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? AppColors.primary
@@ -369,13 +371,12 @@ class _ChatsScreenState extends State<ChatsScreen> {
                           horizontal: 8.0,
                           vertical: 2.0,
                         ),
-                        constraints: const BoxConstraints(
-                          minWidth: 24.0,
-                        ),
+                        constraints: const BoxConstraints(minWidth: 24.0),
                         decoration: BoxDecoration(
                           shape: BoxShape.rectangle,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(12.0)),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(12.0),
+                          ),
                           color: Colors.grey[700],
                         ),
                         child: const Center(

@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:injectable/injectable.dart';
+
 import '../repository/chat_repository.dart';
 import '../entity/chat_entity.dart';
 import '../entity/message_entity.dart';
 
-class ChatUseCase {
+@lazySingleton
+final class ChatUseCase {
   final ChatRepository _chatRepository;
 
   ChatUseCase(this._chatRepository);

@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import '../../../../../domain/entity/message_entity.dart';
 import '../../../../../../../features/user/domain/entity/user_entity.dart';
-import '../../../../../../../../core/di/locator.dart';
+import '../../../../../../../core/di/locator.dart';
 import '../../../../../../../../core/constants/app_colors.dart';
 import '../../../../../../../features/auth/presentation/store/auth_store.dart';
 

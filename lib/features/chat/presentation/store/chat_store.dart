@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import '../../domain/usecase/chat_usecase.dart';
 import '../../domain/entity/chat_entity.dart';
@@ -6,7 +7,8 @@ import '../../domain/entity/message_entity.dart';
 
 part 'chat_store.g.dart';
 
-class ChatStore = _ChatStore with _$ChatStore;
+@lazySingleton
+final class ChatStore = _ChatStore with _$ChatStore;
 
 abstract class _ChatStore with Store {
   final ChatUseCase _chatUseCase;

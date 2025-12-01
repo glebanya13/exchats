@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:injectable/injectable.dart';
+
 import '../../domain/repository/chat_repository.dart';
 import '../../domain/entity/chat_entity.dart';
 import '../../domain/entity/message_entity.dart';
@@ -6,7 +8,8 @@ import '../../../../core/api/api_service.dart';
 import '../mapper/chat_mapper.dart';
 import '../mapper/message_mapper.dart';
 
-class ChatRepositoryImpl implements ChatRepository {
+@LazySingleton(as: ChatRepository)
+final class ChatRepositoryImpl implements ChatRepository {
   final ApiService _apiService;
   final Map<String, StreamController<List<MessageEntity>>> _messageStreams = {};
 

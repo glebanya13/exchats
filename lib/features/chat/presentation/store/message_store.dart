@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import '../../domain/usecase/chat_usecase.dart';
 import '../../domain/entity/message_entity.dart';
 
 part 'message_store.g.dart';
 
+@injectable
 class MessageStore = _MessageStore with _$MessageStore;
 
 abstract class _MessageStore with Store {

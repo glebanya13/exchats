@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:injectable/injectable.dart';
+
 import '../../domain/repository/user_repository.dart';
 import '../../domain/entity/user_entity.dart';
 import '../../../../core/api/api_service.dart';
@@ -6,7 +8,8 @@ import '../mapper/user_mapper.dart';
 import '../datasource/user_api_service.dart';
 import '../dto/update_user_request_dto.dart';
 
-class UserRepositoryImpl implements UserRepository {
+@LazySingleton(as: UserRepository)
+final class UserRepositoryImpl implements UserRepository {
   final ApiService _apiService;
   final UserApiService _userApiService;
   final Map<String, StreamController<UserEntity?>> _userStreams = {};

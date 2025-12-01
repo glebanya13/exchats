@@ -1,24 +1,35 @@
+import 'package:country_picker/country_picker.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:exchats/core/di/init.dart';
+import 'package:exchats/generated/locale_loader.g.dart';
 import 'package:flutter/material.dart';
-import 'core/di/locator.dart';
 import 'core/router/app_router.dart';
 import 'core/constants/app_colors.dart';
-import 'features/auth/presentation/store/auth_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await setupLocator();
 
-  final authStore = locator<AuthStore>();
-  await authStore.checkAuthStatus();
+  await initDI();
 
-  runApp(const TelegramCloneApp());
+  runApp(
+    EasyLocalization(
+      ignorePluralRules: false,
+      supportedLocales: const [Locale('ru')],
+      path: 'assets/lang',
+      fallbackLocale: const Locale('ru'),
+      assetLoader: const CodegenLoader(),
+      child: const ExChatsApp(),
+    ),
+  );
 }
 
-class TelegramCloneApp extends StatelessWidget {
-  const TelegramCloneApp({super.key});
+class ExChatsApp extends StatelessWidget {
+  const ExChatsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localization = EasyLocalization.of(context);
+
     final theme = ThemeData(
       useMaterial3: false,
       colorScheme: ColorScheme.fromSeed(
@@ -37,9 +48,7 @@ class TelegramCloneApp extends StatelessWidget {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
-        ),
+        style: TextButton.styleFrom(foregroundColor: AppColors.primary),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -47,13 +56,20 @@ class TelegramCloneApp extends StatelessWidget {
           side: const BorderSide(color: AppColors.primary),
         ),
       ),
+      splashFactory: NoSplash.splashFactory,
     );
 
     return MaterialApp.router(
-      title: 'Telegram',
+      title: 'ExChats',
       theme: theme,
       routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        ...localization?.delegates ?? [],
+        CountryLocalizations.delegate,
+      ],
+      supportedLocales: localization?.supportedLocales ?? const [Locale('ru')],
+      locale: localization?.locale,
     );
   }
 }
