@@ -1,30 +1,14 @@
-import 'dart:io';
-
 import 'package:country_picker/country_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:exchats/core/di/init.dart';
 import 'package:exchats/generated/locale_loader.g.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'core/router/app_router.dart';
 import 'core/constants/app_colors.dart';
 
-class ProxyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    final client = super.createHttpClient(context);
-    client.findProxy = (_) => 'PROXY localhost:9090';
-    client.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    return client;
-  }
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (kDebugMode) {
-    HttpOverrides.global = ProxyHttpOverrides();
-  }
+
   await initDI();
 
   runApp(
