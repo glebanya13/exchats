@@ -1,6 +1,6 @@
+import 'package:exchats/core/services/secure_storage/token_repository.dart';
+import 'package:exchats/features/splash/presentation/ui/splash_screen.dart';
 import 'package:go_router/go_router.dart';
-import '../di/locator.dart';
-import '../../features/auth/presentation/store/auth_store.dart';
 import '../../features/auth/presentation/ui/auth/auth_screen.dart';
 import '../../features/auth/presentation/ui/auth/login/login_screen.dart';
 import '../../features/auth/presentation/ui/auth/verification/verification_screen.dart';
@@ -24,22 +24,17 @@ import '../../features/call/presentation/ui/calls/new_call_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/auth',
-    redirect: (context, state) {
-      final authStore = locator<AuthStore>();
-      final isAuthRoute = state.matchedLocation.startsWith('/auth');
-
-      if (!authStore.isAuthenticated && !isAuthRoute) {
-        return '/auth';
-      }
-
-      if (authStore.isAuthenticated && isAuthRoute) {
-        return '/';
-      }
-
-      return null;
-    },
+    initialLocation: '/splash',
     routes: [
+      GoRoute(
+        path: '/splash',
+        name: 'splash ',
+        builder: (context, state) => const SplashScreen(),
+        redirect: (context, state) async {
+          final isAuthenticated = await TokenRepository.hasAccessToken();
+          return isAuthenticated ? '/' : '/auth';
+        },
+      ),
       GoRoute(
         path: '/auth',
         builder: (context, state) => const AuthScreen(),
@@ -163,10 +158,7 @@ class AppRouter {
               final groupId = state.uri.queryParameters['groupId'] ?? '';
               final groupName =
                   state.uri.queryParameters['groupName'] ?? 'Группа';
-              return GroupProfileScreen(
-                groupId: groupId,
-                groupName: groupName,
-              );
+              return GroupProfileScreen(groupId: groupId, groupName: groupName);
             },
           ),
           GoRoute(

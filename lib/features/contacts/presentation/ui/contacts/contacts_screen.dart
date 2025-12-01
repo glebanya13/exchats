@@ -27,11 +27,7 @@ class ContactsScreen extends StatefulWidget {
 class _ContactsScreenState extends State<ContactsScreen> {
   final TextEditingController _searchController = TextEditingController();
   final List<ContactItem> _allContacts = [
-    ContactItem(
-      name: 'Артём',
-      avatarColor: Colors.pink,
-      isOnline: true,
-    ),
+    ContactItem(name: 'Артём', avatarColor: Colors.pink, isOnline: true),
     ContactItem(
       name: 'Дмитрий',
       avatarColor: Colors.orange,
@@ -99,7 +95,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         'сентября',
         'октября',
         'ноября',
-        'декабря'
+        'декабря',
       ];
       return 'Был(а) ${lastSeen.day} ${months[lastSeen.month - 1]} в $time';
     } else {
@@ -115,7 +111,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
         'сентября',
         'октября',
         'ноября',
-        'декабря'
+        'декабря',
       ];
       return 'Был(а) ${lastSeen.day} ${months[lastSeen.month - 1]} ${lastSeen.year} в $time';
     }
@@ -124,7 +120,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -138,10 +134,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Поиск',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 16.0,
-                  ),
+                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16.0),
                   prefixIcon: Icon(
                     Icons.search,
                     color: Colors.grey[400],
@@ -234,9 +227,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                       contact.isOnline
                                           ? AppStrings.online
                                           : contact.lastSeen != null
-                                              ? _formatLastSeen(
-                                                  contact.lastSeen!)
-                                              : 'Недавно',
+                                          ? _formatLastSeen(contact.lastSeen!)
+                                          : 'Недавно',
                                       style: TextStyle(
                                         fontSize: 14.0,
                                         color: Colors.grey[600],

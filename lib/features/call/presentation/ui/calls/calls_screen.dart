@@ -28,7 +28,7 @@ class _CallsScreenState extends State<CallsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -42,10 +42,7 @@ class _CallsScreenState extends State<CallsScreen> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: CallsStrings.kSearch,
-                  hintStyle: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 16.0,
-                  ),
+                  hintStyle: TextStyle(color: Colors.grey[600], fontSize: 16.0),
                   prefixIcon: Icon(
                     Icons.search,
                     color: Colors.grey[600],
@@ -86,11 +83,7 @@ class _CallsScreenState extends State<CallsScreen> {
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.phone,
-                          color: AppColors.primary,
-                          size: 24.0,
-                        ),
+                        Icon(Icons.phone, color: AppColors.primary, size: 24.0),
                         const SizedBox(width: 12.0),
                         Text(
                           CallsStrings.kNewCall,
@@ -210,8 +203,8 @@ class _CallsScreenState extends State<CallsScreen> {
                             isMissed
                                 ? Icons.call_missed
                                 : isIncoming
-                                    ? Icons.call_received
-                                    : Icons.call_made,
+                                ? Icons.call_received
+                                : Icons.call_made,
                             size: 16.0,
                             color: isMissed ? Colors.red : Colors.green,
                           ),

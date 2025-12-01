@@ -20,11 +20,15 @@ import '../../features/auth/data/repository/auth_repository_impl.dart' as _i409;
 import '../../features/auth/domain/repository/auth_repository.dart' as _i961;
 import '../../features/auth/domain/usecase/auth_usecase.dart' as _i676;
 import '../../features/auth/presentation/store/auth_store.dart' as _i172;
+import '../../features/auth/presentation/store/login_store.dart' as _i847;
+import '../../features/auth/presentation/store/verification_store.dart'
+    as _i295;
 import '../../features/chat/data/repository/chat_repository_impl.dart' as _i88;
 import '../../features/chat/domain/repository/chat_repository.dart' as _i477;
 import '../../features/chat/domain/usecase/chat_usecase.dart' as _i291;
 import '../../features/chat/presentation/store/chat_store.dart' as _i448;
 import '../../features/chat/presentation/store/message_store.dart' as _i575;
+import '../../features/profile/presentation/store/profile_store.dart' as _i390;
 import '../../features/user/data/datasource/user_api_service.dart' as _i673;
 import '../../features/user/data/repository/user_repository_impl.dart' as _i733;
 import '../../features/user/domain/repository/user_repository.dart' as _i450;
@@ -79,6 +83,15 @@ Future<_i174.GetIt> $initGetIt(
   );
   gh.lazySingleton<_i172.AuthStore>(
     () => _i172.AuthStore(gh<_i676.AuthUseCase>()),
+  );
+  gh.lazySingleton<_i847.LoginStore>(
+    () => _i847.LoginStore(gh<_i676.AuthUseCase>()),
+  );
+  gh.lazySingleton<_i295.VerificationStore>(
+    () => _i295.VerificationStore(gh<_i676.AuthUseCase>()),
+  );
+  gh.lazySingleton<_i390.ProfileStore>(
+    () => _i390.ProfileStore(gh<_i676.AuthUseCase>()),
   );
   gh.lazySingleton<_i281.UserUseCase>(
     () => _i281.UserUseCase(gh<_i450.UserRepository>()),

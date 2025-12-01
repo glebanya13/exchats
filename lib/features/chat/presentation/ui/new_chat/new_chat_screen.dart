@@ -63,7 +63,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surface,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -85,8 +85,10 @@ class _NewChatScreenState extends State<NewChatScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8.0),
@@ -135,7 +137,9 @@ class _NewChatScreenState extends State<NewChatScreen> {
                     borderRadius: BorderRadius.circular(8.0),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 12.0),
+                        horizontal: 16.0,
+                        vertical: 12.0,
+                      ),
                       child: Row(
                         children: [
                           Container(
@@ -234,10 +238,8 @@ class _NewChatScreenState extends State<NewChatScreen> {
 class CreateGroupScreen extends StatefulWidget {
   final List<String> selectedContacts;
 
-  const CreateGroupScreen({
-    Key? key,
-    required this.selectedContacts,
-  }) : super(key: key);
+  const CreateGroupScreen({Key? key, required this.selectedContacts})
+    : super(key: key);
 
   @override
   _CreateGroupScreenState createState() => _CreateGroupScreenState();
@@ -270,7 +272,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surface,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -308,17 +310,16 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   const SizedBox(height: 8.0),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 12.0),
+                      horizontal: 16.0,
+                      vertical: 12.0,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF0F1F3),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: TextField(
                       controller: _groupNameController,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.black87,
-                      ),
+                      style: TextStyle(fontSize: 16.0, color: Colors.black87),
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         isDense: true,
@@ -350,7 +351,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8.0),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 12.0),
+                      horizontal: 16.0,
+                      vertical: 12.0,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8.0),
@@ -405,11 +408,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
-          child: Icon(
-            Icons.arrow_forward,
-            color: Colors.white,
-            size: 20.0,
-          ),
+          child: Icon(Icons.arrow_forward, color: Colors.white, size: 20.0),
         ),
       ),
     );

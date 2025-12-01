@@ -1,3 +1,4 @@
+import 'package:exchats/features/profile/presentation/store/profile_store.dart';
 import 'package:flutter/material.dart';
 import 'package:exchats/core/constants/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,7 +6,6 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:exchats/core/di/locator.dart';
 import 'package:exchats/features/user/presentation/store/user_store.dart';
-import 'package:exchats/features/auth/presentation/store/auth_store.dart';
 import 'package:exchats/core/util/user_formatter.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,38 +16,34 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  late final ProfileStore _profileStore;
   @override
   void initState() {
     super.initState();
-    final authStore = locator<AuthStore>();
-    if (authStore.isAuthenticated && authStore.currentUser == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        authStore.checkAuthStatus();
-      });
-    }
+    _profileStore = locator<ProfileStore>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _profileStore.getCurrentUser();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final userStore = locator<UserStore>();
-    final authStore = locator<AuthStore>();
 
     return Observer(
       builder: (_) {
-        final user = authStore.currentUser ?? userStore.user;
-        if (user == null && authStore.isLoading) {
+        final user = _profileStore.currentUser ?? userStore.user;
+        if (user == null && _profileStore.isLoading) {
           return Scaffold(
-            backgroundColor: AppColors.background,
-            body: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            backgroundColor: AppColors.surface,
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
         final userName = UserFormatter.resolveUserName(user);
         final phoneNumber = UserFormatter.formatPhone(user?.phone);
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppColors.surface,
           body: SafeArea(
             child: SingleChildScrollView(
               child: Column(
@@ -186,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          await authStore.logout();
+                          await _profileStore.logout();
                           if (context.mounted) {
                             context.go('/auth');
                           }
@@ -202,7 +198,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: const Text(
                           'Выйти из аккаунта',
                           style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.w600),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

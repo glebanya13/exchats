@@ -10,10 +10,7 @@ class ContactItem {
   final String name;
   final Color avatarColor;
 
-  ContactItem({
-    required this.name,
-    required this.avatarColor,
-  });
+  ContactItem({required this.name, required this.avatarColor});
 }
 
 class NewCallScreen extends StatefulWidget {
@@ -65,7 +62,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surface,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -97,10 +94,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: CallsStrings.kSearch,
-                  hintStyle: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 16.0,
-                  ),
+                  hintStyle: TextStyle(color: Colors.grey[600], fontSize: 16.0),
                   prefixIcon: Icon(
                     Icons.search,
                     color: Colors.grey[600],
@@ -253,11 +247,7 @@ class _NewCallScreenState extends State<NewCallScreen> {
               ),
             ),
             if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: AppColors.primary,
-                size: 24.0,
-              ),
+              Icon(Icons.check_circle, color: AppColors.primary, size: 24.0),
           ],
         ),
       ),
