@@ -59,8 +59,9 @@ class _AppPinputState extends State<AppPinput> {
       border: Border.all(color: errorColor, width: 1),
     );
     final basePinTheme = PinTheme(
-      width: 40,
+      constraints: const BoxConstraints(minWidth: 40),
       height: 40,
+
       textStyle: baseTextStyle,
       decoration: baseDecoration,
     );
@@ -73,22 +74,21 @@ class _AppPinputState extends State<AppPinput> {
       decoration: errorDecoration,
     );
 
-    return Center(
-      child: Pinput(
-        controller: _otpController,
-        length: widget.length,
-        onChanged: widget.onChanged,
-        separatorBuilder: (index) => const SizedBox(width: 8),
-        onCompleted: (code) {
-          widget.onCompleted(code);
-        },
-        defaultPinTheme: basePinTheme,
-        focusedPinTheme: activePinTheme,
-        submittedPinTheme: activePinTheme,
-        errorPinTheme: errorPinTheme,
-        forceErrorState: widget.showError,
-        preFilledWidget: Text('•', style: baseTextStyle),
-      ),
+    return Pinput(
+      controller: _otpController,
+      length: widget.length,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      onChanged: widget.onChanged,
+      separatorBuilder: (index) => const SizedBox(width: 8),
+      onCompleted: (code) {
+        widget.onCompleted(code);
+      },
+      defaultPinTheme: basePinTheme,
+      focusedPinTheme: activePinTheme,
+      submittedPinTheme: activePinTheme,
+      errorPinTheme: errorPinTheme,
+      forceErrorState: widget.showError,
+      preFilledWidget: Text('•', style: baseTextStyle),
     );
   }
 }
