@@ -28,7 +28,7 @@ class ChatListItem extends StatelessWidget {
 
     String? otherUserId;
     if (isDialog) {
-      otherUserId = chat.users.firstWhere(
+      otherUserId = chat.participantUserIds.firstWhere(
         (userId) => userId != currentUserId,
         orElse: () => '',
       );
@@ -222,6 +222,6 @@ class ChatListItem extends StatelessWidget {
   }
 
   int _getUnreadCount(ChatEntity chat, MessageEntity? lastMessage) {
-    return chat.messageCounter;
+    return chat.unreadCount;
   }
 }

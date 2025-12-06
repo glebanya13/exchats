@@ -4,6 +4,12 @@ import 'package:exchats/core/constants/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:exchats/core/widgets/appbar_icon_button.dart';
+import 'package:exchats/core/di/locator.dart';
+import 'package:exchats/features/user/domain/usecase/user_usecase.dart';
+import 'package:exchats/features/user/domain/entity/user_entity.dart';
+import 'package:exchats/core/util/last_seen_formatter.dart';
+import 'package:exchats/core/util/user_formatter.dart';
+import 'package:exchats/core/assets/gen/assets.gen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;
@@ -25,6 +31,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTabIndex = 0;
+  UserEntity? _user;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -35,6 +43,29 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         _selectedTabIndex = _tabController.index;
       });
     });
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final userUseCase = locator<UserUseCase>();
+      final user = await userUseCase.getUserById(widget.userId);
+      if (mounted) {
+        setState(() {
+          _user = user;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -78,8 +109,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       shape: BoxShape.circle,
                     ),
                     child: Center(
-                      child: SvgPicture.asset(
-                        'assets/profile/user.svg',
+                      child: Assets.profile.user.svg(
                         width: 48.0,
                         height: 48.0,
                         colorFilter: const ColorFilter.mode(
@@ -91,7 +121,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   ),
                   const SizedBox(height: 16.0),
                   Text(
-                    widget.userName,
+                    _user != null
+                        ? UserFormatter.resolveDisplayName(_user!)
+                        : widget.userName,
                     style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -100,11 +132,17 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    widget.userStatus ?? AppStrings.online,
-                    style: const TextStyle(
+                    _user != null
+                        ? (LastSeenFormatter.isOnline(_user!.lastSeenAt)
+                            ? AppStrings.online
+                            : LastSeenFormatter.format(_user!.lastSeenAt))
+                        : (widget.userStatus ?? AppStrings.online),
+                    style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.normal,
-                      color: AppColors.primary,
+                      color: _user != null && LastSeenFormatter.isOnline(_user!.lastSeenAt)
+                          ? AppColors.primary
+                          : Colors.grey[600]!,
                     ),
                   ),
                   const SizedBox(height: 24.0),
@@ -149,30 +187,36 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
-                  _buildDetailCard(
-                    label: 'Телефон',
-                    value: '+7 (909) 844-12-23',
-                    valueColor: AppColors.primary,
-                  ),
-                  const SizedBox(height: 8.0),
-                  _buildDetailCard(
-                    label: 'О себе',
-                    value: 'БИО',
-                    valueColor: Colors.black87,
-                    valueFontWeight: FontWeight.bold,
-                  ),
-                  const SizedBox(height: 8.0),
-                  _buildDetailCard(
-                    label: 'Имя пользователя',
-                    value: '@Art_26',
-                    valueColor: AppColors.primary,
-                  ),
-                  const SizedBox(height: 8.0),
-                  _buildDetailCard(
-                    label: 'Почта',
-                    value: 'qwerty@mail.ru',
-                    valueColor: AppColors.primary,
-                  ),
+                  if (_user != null) ...[
+                    if (_user!.phone.isNotEmpty)
+                      _buildDetailCard(
+                        label: 'Телефон',
+                        value: _user!.phone,
+                        valueColor: AppColors.primary,
+                      ),
+                    if (_user!.phone.isNotEmpty) const SizedBox(height: 8.0),
+                    if (_user!.username != null && _user!.username!.isNotEmpty)
+                      _buildDetailCard(
+                        label: 'Имя пользователя',
+                        value: '@${_user!.username}',
+                        valueColor: AppColors.primary,
+                      ),
+                    if (_user!.username.isNotEmpty)
+                      const SizedBox(height: 8.0),
+                  ] else if (_isLoading) ...[
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ] else ...[
+                    _buildDetailCard(
+                      label: 'Телефон',
+                      value: 'Не загружено',
+                      valueColor: Colors.grey[600]!,
+                    ),
+                  ],
                   const SizedBox(height: 24.0),
                 ],
               ),

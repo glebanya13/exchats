@@ -23,6 +23,7 @@ import '../../features/auth/presentation/store/auth_store.dart' as _i172;
 import '../../features/auth/presentation/store/login_store.dart' as _i847;
 import '../../features/auth/presentation/store/verification_store.dart'
     as _i295;
+import '../../features/chat/data/datasource/rooms_api_service.dart' as _i212;
 import '../../features/chat/data/repository/chat_repository_impl.dart' as _i88;
 import '../../features/chat/domain/repository/chat_repository.dart' as _i477;
 import '../../features/chat/domain/usecase/chat_usecase.dart' as _i291;
@@ -63,6 +64,9 @@ Future<_i174.GetIt> $initGetIt(
   gh.lazySingleton<_i372.AuthApiService>(
     () => _i372.AuthApiService(gh<_i1059.ApiProvider>()),
   );
+  gh.lazySingleton<_i212.RoomsApiService>(
+    () => _i212.RoomsApiService(gh<_i1059.ApiProvider>()),
+  );
   gh.lazySingleton<_i673.UserApiService>(
     () => _i673.UserApiService(gh<_i1059.ApiProvider>()),
   );
@@ -73,7 +77,7 @@ Future<_i174.GetIt> $initGetIt(
     () => _i676.AuthUseCase(gh<_i961.AuthRepository>()),
   );
   gh.lazySingleton<_i477.ChatRepository>(
-    () => _i88.ChatRepositoryImpl(gh<_i299.ApiService>()),
+    () => _i88.ChatRepositoryImpl(gh<_i212.RoomsApiService>()),
   );
   gh.lazySingleton<_i450.UserRepository>(
     () => _i733.UserRepositoryImpl(

@@ -1,61 +1,68 @@
-class MessageDto {
-  final String id;
-  final String owner;
-  final String text;
-  final String createdAt;
-  final String updatedAt;
-  final bool edited;
-  final bool read;
-  final String? replyTo;
+final class MessageDto {
+  final int id;
   final String type;
-  final int? callDuration;
-  final List<String>? participants;
+  final String? fileName;
+  final Map<String, dynamic>? metadata;
+  final int? userId;
+  final DateTime insertedAt;
+  final String content;
+  final DateTime? editedAt;
+  final bool encrypted;
+  final String? fileUrl;
+  final String? guestName;
+  final Map<String, dynamic>? replyTo;
 
   MessageDto({
     required this.id,
-    required this.owner,
-    required this.text,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.edited,
-    required this.read,
+    required this.type,
+    this.fileName,
+    this.metadata,
+    this.userId,
+    required this.insertedAt,
+    required this.content,
+    this.editedAt,
+    required this.encrypted,
+    this.fileUrl,
+    this.guestName,
     this.replyTo,
-    this.type = 'text',
-    this.callDuration,
-    this.participants,
   });
 
-  factory MessageDto.fromJson(Map<String, dynamic> json, {String? id}) {
+  factory MessageDto.fromJson(Map<String, dynamic> json, {int? id}) {
+    final rawId = id ?? json['id'];
+    final normalizedId = rawId is int ? rawId : int.tryParse(rawId.toString()) ?? 0;
+
     return MessageDto(
-      id: id ?? json['id'] as String? ?? '',
-      owner: json['owner'] as String,
-      text: json['text'] as String,
-      createdAt: json['created_at'] as String,
-      updatedAt: json['updated_at'] as String,
-      edited: json['edited'] as bool? ?? false,
-      read: json['read'] as bool? ?? false,
-      replyTo: json['reply_to'] as String?,
+      id: normalizedId,
       type: json['type'] as String? ?? 'text',
-      callDuration: json['call_duration'] as int?,
-      participants: json['participants'] != null
-          ? List<String>.from(json['participants'])
+      fileName: json['file_name'] as String?,
+      metadata: json['metadata'] as Map<String, dynamic>?,
+      userId: json['user_id'] as int?,
+      insertedAt: DateTime.parse(json['inserted_at'] as String),
+      content: json['content'] as String? ?? '',
+      editedAt: json['edited_at'] != null
+          ? DateTime.tryParse(json['edited_at'] as String)
           : null,
+      encrypted: json['encrypted'] as bool? ?? false,
+      fileUrl: json['file_url'] as String?,
+      guestName: json['guest_name'] as String?,
+      replyTo: json['reply_to'] as Map<String, dynamic>?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'owner': owner,
-      'text': text,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-      'edited': edited,
-      'read': read,
-      if (replyTo != null) 'reply_to': replyTo,
       'type': type,
-      if (callDuration != null) 'call_duration': callDuration,
-      if (participants != null) 'participants': participants,
+      if (fileName != null) 'file_name': fileName,
+      if (metadata != null) 'metadata': metadata,
+      if (userId != null) 'user_id': userId,
+      'inserted_at': insertedAt.toIso8601String(),
+      'content': content,
+      if (editedAt != null) 'edited_at': editedAt!.toIso8601String(),
+      'encrypted': encrypted,
+      if (fileUrl != null) 'file_url': fileUrl,
+      if (guestName != null) 'guest_name': guestName,
+      if (replyTo != null) 'reply_to': replyTo,
     };
   }
 }

@@ -11,18 +11,55 @@ import 'package:exchats/core/constants/app_strings.dart';
 import 'package:exchats/core/constants/app_colors.dart';
 import 'package:exchats/core/util/last_seen_formatter.dart';
 
-class MyProfileScreen extends StatelessWidget {
+class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MyProfileScreen> createState() => _MyProfileScreenState();
+}
+
+class _MyProfileScreenState extends State<MyProfileScreen> {
+  late final AuthStore _authStore;
+  late final UserStore _userStore;
+
+  @override
+  void initState() {
+    super.initState();
+    _authStore = locator<AuthStore>();
+    _userStore = locator<UserStore>();
+    
+    // Загружаем данные пользователя при открытии экрана
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_authStore.currentUser == null) {
+        _authStore.checkAuthStatus();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userStore = locator<UserStore>();
-    final authStore = locator<AuthStore>();
 
     return Observer(
       builder: (_) {
-        final user = authStore.currentUser ?? userStore.user;
+        final user = _authStore.currentUser ?? _userStore.user;
+        
+        // Показываем индикатор загрузки, если данные загружаются
+        if (user == null && _authStore.isLoading) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => context.pop(),
+              ),
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+        
         final userName = UserFormatter.resolveDisplayName(user);
         final phoneNumber = UserFormatter.formatPhone(user?.phone);
         final statusText = user == null
@@ -35,100 +72,100 @@ class MyProfileScreen extends StatelessWidget {
             : AppStrings.unknown;
 
         return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => context.pop(),
-            ),
-            actions: [
-              IconButton(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          IconButton(
                 icon: const Icon(Icons.edit, color: AppColors.iconGray),
                 onPressed: user == null
                     ? null
                     : () => _showEditProfileSheet(
                           context,
-                          userStore,
-                          authStore,
+                          _userStore,
+                          _authStore,
                           user,
                         ),
-              ),
-            ],
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 16.0),
-                Container(
-                  width: 78.0,
-                  height: 78.0,
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      'assets/profile/user.svg',
-                      width: 39.0,
-                      height: 39.0,
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 16.0),
+            Container(
+              width: 78.0,
+              height: 78.0,
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/profile/user.svg',
+                  width: 39.0,
+                  height: 39.0,
                       colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                    ),
+                    Colors.white,
+                    BlendMode.srcIn,
                   ),
                 ),
-                const SizedBox(height: 16.0),
-                Text(
-                  userName,
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            Text(
+              userName,
                   style: const TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
+                fontSize: 24.0,
+                fontWeight: FontWeight.normal,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
                   statusText,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: theme.colorScheme.secondary,
+              style: TextStyle(
+                fontSize: 16.0,
+                color: theme.colorScheme.secondary,
+              ),
+            ),
+            const SizedBox(height: 32.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                children: [
+                  _buildDetailCard(
+                    label: 'Телефон',
+                    value: phoneNumber,
+                    valueColor: theme.colorScheme.secondary,
                   ),
-                ),
-                const SizedBox(height: 32.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    children: [
-                      _buildDetailCard(
-                        label: 'Телефон',
-                        value: phoneNumber,
-                        valueColor: theme.colorScheme.secondary,
-                      ),
-                      const SizedBox(height: 8.0),
-                      _buildDetailCard(
-                        label: 'Имя пользователя',
+                  const SizedBox(height: 8.0),
+                  _buildDetailCard(
+                    label: 'Имя пользователя',
                         value:
                             user?.username != null && user!.username.isNotEmpty
                                 ? '@${user.username}'
                                 : '—',
-                        valueColor: theme.colorScheme.secondary,
-                      ),
-                      const SizedBox(height: 8.0),
-                      _buildDetailCard(
-                        label: 'Почта',
-                        value: emailText,
-                        valueColor: theme.colorScheme.secondary,
-                      ),
-                      const SizedBox(height: 32.0),
-                    ],
+                    valueColor: theme.colorScheme.secondary,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8.0),
+                  _buildDetailCard(
+                    label: 'Почта',
+                        value: emailText,
+                    valueColor: theme.colorScheme.secondary,
+                  ),
+                  const SizedBox(height: 32.0),
+                ],
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
         );
       },
     );

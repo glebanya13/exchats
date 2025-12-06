@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import '../../domain/usecase/chat_usecase.dart';
@@ -29,9 +30,28 @@ abstract class _MessageStore with Store {
   void watchMessages(String chatId) {
     _messagesSubscription?.cancel();
     _messagesSubscription =
-        _chatUseCase.watchChatMessages(chatId).listen((messages) {
-      this.messages.clear();
-      this.messages.addAll(messages);
+        _chatUseCase.watchChatMessages(chatId).listen((newMessages) {
+      runInAction(() {
+        final pendingMessages = this.messages
+            .where((m) => m.id == '0')
+            .toList();
+        
+        this.messages.clear();
+        this.messages.addAll(newMessages);
+        
+        for (final pending in pendingMessages) {
+          final exists = newMessages.any((m) => 
+            m.content == pending.content && 
+            m.userId == pending.userId &&
+            m.insertedAt.difference(pending.insertedAt).inSeconds.abs() < 10
+          );
+          if (!exists) {
+            this.messages.add(pending);
+          }
+        }
+        
+        this.messages.sort((a, b) => a.insertedAt.compareTo(b.insertedAt));
+      });
     });
 
     loadMessages(chatId);
@@ -45,6 +65,7 @@ abstract class _MessageStore with Store {
       final loadedMessages = await _chatUseCase.getChatMessages(chatId);
       messages.clear();
       messages.addAll(loadedMessages);
+      messages.sort((a, b) => a.insertedAt.compareTo(b.insertedAt));
     } catch (e) {
       error = e.toString();
     } finally {
@@ -56,7 +77,19 @@ abstract class _MessageStore with Store {
   Future<void> sendMessage(String chatId, MessageEntity message) async {
     try {
       final sentMessage = await _chatUseCase.sendMessage(chatId, message);
-      messages.add(sentMessage);
+      
+      final existingIndex = messages.indexWhere((m) => 
+        m.id == sentMessage.id || 
+        (m.id == '0' && m.content == sentMessage.content && m.userId == sentMessage.userId)
+      );
+      
+      if (existingIndex == -1) {
+        messages.add(sentMessage);
+      } else {
+        messages[existingIndex] = sentMessage;
+      }
+      
+      messages.sort((a, b) => a.insertedAt.compareTo(b.insertedAt));
     } catch (e) {
       error = e.toString();
       rethrow;
@@ -101,16 +134,17 @@ abstract class _MessageStore with Store {
           final message = messages[index];
           messages[index] = MessageEntity(
             id: message.id,
-            owner: message.owner,
-            text: message.text,
-            createdAt: message.createdAt,
-            updatedAt: message.updatedAt,
-            edited: message.edited,
-            read: true,
-            replyTo: message.replyTo,
             type: message.type,
-            callDuration: message.callDuration,
-            participants: message.participants,
+            fileName: message.fileName,
+            metadata: message.metadata,
+            userId: message.userId,
+            insertedAt: message.insertedAt,
+            content: message.content,
+            editedAt: message.editedAt,
+            encrypted: message.encrypted,
+            fileUrl: message.fileUrl,
+            guestName: message.guestName,
+            replyTo: message.replyTo,
           );
         }
       }

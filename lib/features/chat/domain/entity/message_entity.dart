@@ -1,27 +1,39 @@
-class MessageEntity {
-  final String id;
-  final String owner;
-  final String text;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final bool edited;
-  final bool read;
-  final String? replyTo;
+final class MessageEntity {
+  final String id; // converted from int
   final String type;
-  final Duration? callDuration;
-  final List<String>? participants;
+  final String? fileName;
+  final Map<String, dynamic>? metadata;
+  final String? userId; // converted from int
+  final DateTime insertedAt;
+  final String content;
+  final DateTime? editedAt;
+  final bool encrypted;
+  final String? fileUrl;
+  final String? guestName;
+  final Map<String, dynamic>? replyTo;
 
   MessageEntity({
     required this.id,
-    required this.owner,
-    required this.text,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.edited,
-    required this.read,
+    required this.type,
+    this.fileName,
+    this.metadata,
+    this.userId,
+    required this.insertedAt,
+    required this.content,
+    this.editedAt,
+    required this.encrypted,
+    this.fileUrl,
+    this.guestName,
     this.replyTo,
-    this.type = 'text',
-    this.callDuration,
-    this.participants,
   });
+
+  // Helper getters for backward compatibility
+  String get text => content;
+  DateTime get createdAt => insertedAt;
+  DateTime get updatedAt => editedAt ?? insertedAt;
+  bool get edited => editedAt != null;
+  String? get owner => userId;
+  bool get read => true; // TODO: implement read status from participants
+  Duration? get callDuration => null; // TODO: extract from metadata if needed
+  List<String>? get participants => null; // TODO: extract from metadata if needed
 }

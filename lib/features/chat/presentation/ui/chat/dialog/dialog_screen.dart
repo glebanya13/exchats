@@ -74,9 +74,12 @@ class _DialogScreenState extends State<DialogScreen>
     _chatStore = locator<ChatStore>();
     _authStore = locator<AuthStore>();
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      if (_authStore.currentUser == null) {
+        await _authStore.checkAuthStatus();
+      }
+      
       _loadChatInfo();
-
       _messageStore.watchMessages(widget.chatId);
     });
   }
@@ -90,7 +93,7 @@ class _DialogScreenState extends State<DialogScreen>
 
       if (chat.type == 'dialog') {
         final currentUserId = _authStore.currentUserId ?? '';
-        final otherUserId = chat.users.firstWhere(
+        final otherUserId = chat.participantUserIds.firstWhere(
           (userId) => userId != currentUserId,
           orElse: () => '',
         );
@@ -154,7 +157,9 @@ class _DialogScreenState extends State<DialogScreen>
                       final message = _messagesMap[messageId];
                       setState(() {
                         _replyToMessage = message;
-                        _replyToUser = _usersMap[message?.owner];
+                        _replyToUser = message?.userId != null 
+                            ? _usersMap[message!.userId!] 
+                            : null;
                         _isSelectionMode = false;
                         _selectedMessageIds.clear();
                       });
@@ -181,6 +186,62 @@ class _DialogScreenState extends State<DialogScreen>
                       _replyToMessage = null;
                       _replyToUser = null;
                     });
+                  },
+                  onSend: (text, replyTo) async {
+                    if (text.trim().isEmpty) return;
+
+                    // Проверяем и загружаем текущего пользователя
+                    UserEntity? currentUser = _authStore.currentUser;
+                    if (currentUser == null) {
+                      await _authStore.checkAuthStatus();
+                      currentUser = _authStore.currentUser;
+                    }
+
+                    if (currentUser == null) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Пользователь не авторизован')),
+                        );
+                      }
+                      return;
+                    }
+
+                    final currentUserId = currentUser.id;
+
+                    final message = MessageEntity(
+                      id: '0',
+                      type: 'text',
+                      fileName: null,
+                      metadata: null,
+                      userId: currentUserId,
+                      insertedAt: DateTime.now(),
+                      content: text,
+                      editedAt: null,
+                      encrypted: false,
+                      fileUrl: null,
+                      guestName: null,
+                      replyTo: replyTo != null
+                          ? {
+                              'id': replyTo.id,
+                              'content': replyTo.content,
+                              'userId': replyTo.userId,
+                            }
+                          : null,
+                    );
+
+                    try {
+                      await _messageStore.sendMessage(widget.chatId, message);
+                      setState(() {
+                        _replyToMessage = null;
+                        _replyToUser = null;
+                      });
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Ошибка отправки сообщения: ${e.toString()}')),
+                        );
+                      }
+                    }
                   },
                 ),
             ],
@@ -342,14 +403,93 @@ class _DialogScreenState extends State<DialogScreen>
           iconSize: 24.0,
           iconColor: Colors.grey.shade600,
         ),
-        Transform.rotate(
-          angle: 1.5708,
-          child: AppBarIconButton(
-            onTap: () {},
-            icon: Icons.more_vert,
-            iconSize: 24.0,
-            iconColor: Colors.grey.shade600,
+        PopupMenuButton<String>(
+          icon: Transform.rotate(
+            angle: 1.5708,
+            child: Icon(Icons.more_vert, color: Colors.grey.shade600, size: 24.0),
           ),
+          onSelected: (value) async {
+            if (value == 'delete_chat') {
+              final result = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Удалить чат'),
+                  content: const Text('Вы уверены, что хотите удалить этот чат?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Отмена'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                      ),
+                      child: const Text('Удалить'),
+                    ),
+                  ],
+                ),
+              );
+              if (result == true && mounted) {
+                try {
+                  await _chatStore.deleteChat(widget.chatId);
+                  if (mounted) {
+                    context.pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Чат удален')),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Ошибка удаления чата: ${e.toString()}')),
+                    );
+                  }
+                }
+              }
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'search',
+              child: Row(
+                children: [
+                  Icon(Icons.search, color: Colors.grey[700], size: 20.0),
+                  const SizedBox(width: 12.0),
+                  Text(
+                    'Поиск',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'disable_notifications',
+              child: Row(
+                children: [
+                  Icon(Icons.notifications_off, color: Colors.grey[700], size: 20.0),
+                  const SizedBox(width: 12.0),
+                  Text(
+                    'Отключить уведомления',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'delete_chat',
+              child: Row(
+                children: [
+                  Icon(Icons.delete, color: Colors.red, size: 20.0),
+                  const SizedBox(width: 12.0),
+                  Text(
+                    'Удалить чат',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -439,11 +579,46 @@ class _DialogScreenState extends State<DialogScreen>
             child:
                 Icon(Icons.more_vert, color: Colors.grey.shade600, size: 24.0),
           ),
-          onSelected: (value) {
-            if (value == 'video_call') {
-            } else if (value == 'search') {
-            } else if (value == 'disable_notifications') {
-            } else if (value == 'leave_group') {}
+          onSelected: (value) async {
+            if (value == 'leave_group') {
+              final result = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Выйти из группы'),
+                  content: const Text('Вы уверены, что хотите выйти из этой группы?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Отмена'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                      ),
+                      child: const Text('Выйти'),
+                    ),
+                  ],
+                ),
+              );
+              if (result == true && mounted) {
+                try {
+                  await _chatStore.leaveChat(widget.chatId);
+                  if (mounted) {
+                    context.pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Вы вышли из группы')),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Ошибка выхода из группы: ${e.toString()}')),
+                    );
+                  }
+                }
+              }
+            }
           },
           itemBuilder: (context) => [
             PopupMenuItem(
@@ -506,13 +681,14 @@ class _DialogScreenState extends State<DialogScreen>
   }
 
   Widget _buildMessageList() {
-    final currentUserId = _authStore.currentUserId ?? '';
-
     return Observer(
       builder: (_) {
+        final currentUserId = _authStore.currentUserId ?? '';
+        final currentUser = _authStore.currentUser;
+        final effectiveUserId = (currentUser?.id ?? currentUserId).toString();
+        
         final messages = _messageStore.messages.toList();
-
-        messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        messages.sort((a, b) => a.insertedAt.compareTo(b.insertedAt));
 
         _messagesMap.clear();
         for (var msg in messages) {
@@ -534,8 +710,8 @@ class _DialogScreenState extends State<DialogScreen>
                   UserEntity? typingUser;
                   if (!isDialog && messages.isNotEmpty) {
                     final lastMessage = messages.first;
-                    if (lastMessage.owner != currentUserId) {
-                      typingUser = _usersMap[lastMessage.owner];
+                    if (lastMessage.userId != null && lastMessage.userId != effectiveUserId) {
+                      typingUser = _usersMap[lastMessage.userId];
                     }
                   }
                   return TypingIndicator(
@@ -543,29 +719,39 @@ class _DialogScreenState extends State<DialogScreen>
                     showAvatar: !isDialog && typingUser != null,
                   );
                 }
-                final messageIndex = index - 1;
+                final messageIndex = messages.length - index;
+                if (messageIndex < 0 || messageIndex >= messages.length) {
+                  return const SizedBox.shrink();
+                }
                 final message = messages[messageIndex];
-                final isOwnMessage = message.owner == currentUserId;
-                final previousMessage =
-                    index < messages.length - 1 ? messages[index + 1] : null;
+                final messageUserId = message.userId?.toString() ?? '';
+                final isOwnMessage = messageUserId.isNotEmpty && 
+                    messageUserId == effectiveUserId;
+                final previousMessage = messageIndex < messages.length - 1 
+                    ? messages[messageIndex + 1] 
+                    : null;
                 final showAvatar = previousMessage == null ||
-                    previousMessage.owner != message.owner ||
-                    message.createdAt
-                            .difference(previousMessage.createdAt)
+                    previousMessage.userId != message.userId ||
+                    message.insertedAt
+                            .difference(previousMessage.insertedAt)
                             .inMinutes >
                         5;
 
                 MessageEntity? replyToMsg;
                 UserEntity? replyToUser;
                 if (message.replyTo != null) {
-                  replyToMsg = _messagesMap[message.replyTo];
-                  if (replyToMsg != null) {
-                    replyToUser = _usersMap[replyToMsg.owner];
-                    if (replyToUser == null) {}
+                  final replyToId = message.replyTo?['id']?.toString();
+                  if (replyToId != null) {
+                    replyToMsg = _messagesMap[replyToId];
+                    if (replyToMsg != null && replyToMsg.userId != null) {
+                      replyToUser = _usersMap[replyToMsg.userId];
+                    }
                   }
                 }
 
-                UserEntity? messageUser = _usersMap[message.owner];
+                UserEntity? messageUser = message.userId != null 
+                    ? _usersMap[message.userId] 
+                    : null;
 
                 final isDialog = true;
                 final shouldShowAvatar = isDialog ? false : !isOwnMessage;
@@ -577,6 +763,7 @@ class _DialogScreenState extends State<DialogScreen>
                   messageUser: messageUser,
                   isSelected: _selectedMessageIds.contains(message.id),
                   showAvatar: shouldShowAvatar,
+                  isOwnMessage: isOwnMessage,
                   onTap: () {
                     if (_isSelectionMode) {
                       setState(() {
@@ -630,8 +817,33 @@ class _DialogScreenState extends State<DialogScreen>
     _exitSelectionMode();
   }
 
-  void _deleteSelectedMessages() {
-    _exitSelectionMode();
+  Future<void> _deleteSelectedMessages() async {
+    if (_selectedMessageIds.isEmpty) return;
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => const DeleteMessageDialog(),
+    );
+    
+    if (result == true && mounted) {
+      try {
+        for (final messageId in _selectedMessageIds) {
+          await _messageStore.deleteMessage(widget.chatId, messageId);
+        }
+        _exitSelectionMode();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Сообщения удалены')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Ошибка удаления: ${e.toString()}')),
+          );
+        }
+      }
+    }
   }
 
   void _showMessageContextMenu(BuildContext context, MessageEntity message) {
@@ -663,9 +875,21 @@ class _DialogScreenState extends State<DialogScreen>
           context: context,
           builder: (context) => const DeleteMessageDialog(),
         );
-        if (result != null && mounted) {
-          if (result) {
-          } else {}
+        if (result == true && mounted) {
+          try {
+            await _messageStore.deleteMessage(widget.chatId, message.id);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Сообщение удалено')),
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Ошибка удаления: ${e.toString()}')),
+              );
+            }
+          }
         }
       },
     );

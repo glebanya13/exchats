@@ -42,7 +42,10 @@ final class AuthApiService {
 
   Future<void> logout() async {
     try {
-      await _apiProvider.post<void>('/api/auth/logout');
+      await _apiProvider.post<void>(
+        '/api/auth/logout',
+        options: Options(extra: const {'skipAuth': true}),
+      );
     } on DioException catch (_) {
       // swallow network errors during logout to avoid blocking local cleanup
     }

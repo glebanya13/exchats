@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:exchats/core/constants/app_colors.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:exchats/core/di/locator.dart';
+import 'package:exchats/features/chat/presentation/store/chat_store.dart';
+import 'package:exchats/features/auth/presentation/store/auth_store.dart';
+import 'package:exchats/features/chat/domain/entity/chat_entity.dart';
+import 'package:exchats/features/user/domain/entity/user_entity.dart';
+import 'package:exchats/features/user/domain/repository/user_repository.dart';
+import 'package:exchats/core/assets/gen/assets.gen.dart';
+import 'package:go_router/go_router.dart';
 
 class NewChatScreen extends StatefulWidget {
   const NewChatScreen({Key? key}) : super(key: key);
@@ -11,24 +18,80 @@ class NewChatScreen extends StatefulWidget {
 
 class _NewChatScreenState extends State<NewChatScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final Set<String> _selectedContacts = {};
+  final Set<String> _selectedUserIds = {};
+  final ChatStore _chatStore = locator<ChatStore>();
+  final AuthStore _authStore = locator<AuthStore>();
+  bool _isCreating = false;
+  bool _isLoadingContacts = false;
 
-  final List<Map<String, dynamic>> _contacts = [
-    {'name': 'Артём', 'avatarColor': Colors.purple},
-    {'name': 'Елена', 'avatarColor': Colors.pink},
-    {'name': 'Александр', 'avatarColor': Colors.green},
-    {'name': 'Дмитрий', 'avatarColor': Colors.orange},
-    {'name': 'Иван', 'avatarColor': Colors.blue},
-    {'name': 'София', 'avatarColor': Colors.purple},
-  ];
-
-  List<Map<String, dynamic>> _filteredContacts = [];
+  List<UserEntity> _allContacts = [];
+  List<UserEntity> _filteredContacts = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredContacts = _contacts;
     _searchController.addListener(_filterContacts);
+    _loadContacts();
+  }
+
+  Future<void> _loadContacts() async {
+    setState(() {
+      _isLoadingContacts = true;
+    });
+
+    try {
+      // Получаем текущего пользователя
+      UserEntity? currentUser = _authStore.currentUser;
+      if (currentUser == null) {
+        await _authStore.checkAuthStatus();
+        currentUser = _authStore.currentUser;
+      }
+
+      if (currentUser == null) {
+        setState(() {
+          _isLoadingContacts = false;
+        });
+        return;
+      }
+
+      // Загружаем чаты, чтобы получить список участников
+      final currentUserId = _authStore.currentUserId;
+      if (currentUserId != null) {
+        await _chatStore.loadChats(currentUserId);
+      }
+
+      // Собираем всех уникальных пользователей из участников комнат
+      final Set<String> seenUserIds = {currentUser.id};
+      final List<UserEntity> contacts = [];
+
+      for (final chat in _chatStore.chats) {
+        // Используем participantUserIds из уже загруженных чатов
+        for (final userId in chat.participantUserIds) {
+          if (!seenUserIds.contains(userId) && userId != currentUser.id) {
+            seenUserIds.add(userId);
+            // Получаем данные пользователя
+            try {
+              final user = await locator<UserRepository>().getUserById(userId);
+              if (user != null) {
+                contacts.add(user);
+              }
+            } catch (e) {
+              // Игнорируем ошибки получения пользователя
+            }
+          }
+        }
+      }
+
+      setState(() {
+        _allContacts = contacts;
+        _filteredContacts = contacts;
+        _isLoadingContacts = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingContacts = false;
+      });
+    }
   }
 
   @override
@@ -41,23 +104,43 @@ class _NewChatScreenState extends State<NewChatScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       if (query.isEmpty) {
-        _filteredContacts = _contacts;
+        _filteredContacts = _allContacts;
       } else {
-        _filteredContacts = _contacts
-            .where((contact) => contact['name'].toLowerCase().contains(query))
+        _filteredContacts = _allContacts
+            .where((contact) =>
+                contact.name.toLowerCase().contains(query) ||
+                contact.phone.contains(query) ||
+                (contact.username.isNotEmpty &&
+                    contact.username.toLowerCase().contains(query)))
             .toList();
       }
     });
   }
 
-  void _toggleContact(String name) {
+  void _toggleContact(String userId) {
     setState(() {
-      if (_selectedContacts.contains(name)) {
-        _selectedContacts.remove(name);
+      if (_selectedUserIds.contains(userId)) {
+        _selectedUserIds.remove(userId);
       } else {
-        _selectedContacts.add(name);
+        _selectedUserIds.add(userId);
       }
     });
+  }
+
+  Color _getAvatarColor(String userId) {
+    // Генерируем цвет на основе ID пользователя
+    final hash = userId.hashCode;
+    final colors = [
+      Colors.purple,
+      Colors.pink,
+      Colors.green,
+      Colors.orange,
+      Colors.blue,
+      Colors.teal,
+      Colors.indigo,
+      Colors.red,
+    ];
+    return colors[hash.abs() % colors.length];
   }
 
   @override
@@ -72,7 +155,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Добавить пользователей',
+          'Новый чат',
           style: TextStyle(
             color: Colors.grey[700],
             fontSize: 18.0,
@@ -117,129 +200,227 @@ class _NewChatScreenState extends State<NewChatScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              itemCount: _filteredContacts.length,
-              itemBuilder: (context, index) {
-                final contact = _filteredContacts[index];
-                final name = contact['name'] as String;
-                final avatarColor = contact['avatarColor'] as Color;
-                final isSelected = _selectedContacts.contains(name);
-
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8.0),
-                  decoration: BoxDecoration(
-                    color: isSelected ? Colors.grey[200] : Colors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: InkWell(
-                    onTap: () => _toggleContact(name),
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 12.0,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 20.0,
-                            height: 20.0,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : Colors.grey[400]!,
-                                width: 2.0,
-                              ),
-                              borderRadius: BorderRadius.circular(4.0),
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : Colors.transparent,
-                            ),
-                            child: isSelected
-                                ? Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                    size: 14.0,
-                                  )
-                                : null,
+            child: _isLoadingContacts
+                ? Center(child: CircularProgressIndicator())
+                : _filteredContacts.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Нет доступных контактов',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16.0,
                           ),
-                          const SizedBox(width: 12.0),
-                          Container(
-                            width: 40.0,
-                            height: 40.0,
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        itemCount: _filteredContacts.length,
+                        itemBuilder: (context, index) {
+                          final contact = _filteredContacts[index];
+                          final displayName = contact.name.isNotEmpty
+                              ? contact.name
+                              : contact.phone;
+                          final avatarColor = _getAvatarColor(contact.id);
+                          final isSelected = _selectedUserIds.contains(contact.id);
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8.0),
                             decoration: BoxDecoration(
-                              color: avatarColor.withOpacity(0.2),
-                              shape: BoxShape.circle,
+                              color: isSelected ? Colors.grey[200] : Colors.white,
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'assets/profile/user.svg',
-                                width: 20.0,
-                                height: 20.0,
-                                colorFilter: ColorFilter.mode(
-                                  avatarColor,
-                                  BlendMode.srcIn,
+                            child: InkWell(
+                              onTap: () => _toggleContact(contact.id),
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 12.0,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 20.0,
+                                      height: 20.0,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? AppColors.primary
+                                              : Colors.grey[400]!,
+                                          width: 2.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(4.0),
+                                        color: isSelected
+                                            ? AppColors.primary
+                                            : Colors.transparent,
+                                      ),
+                                      child: isSelected
+                                          ? Icon(
+                                              Icons.check,
+                                              color: Colors.white,
+                                              size: 14.0,
+                                            )
+                                          : null,
+                                    ),
+                                    const SizedBox(width: 12.0),
+                                    Container(
+                                      width: 40.0,
+                                      height: 40.0,
+                                      decoration: BoxDecoration(
+                                        color: avatarColor.withOpacity(0.2),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Assets.profile.user.svg(
+                                          width: 20.0,
+                                          height: 20.0,
+                                          colorFilter: ColorFilter.mode(
+                                            avatarColor,
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16.0),
+                                    Expanded(
+                                      child: Text(
+                                        displayName,
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16.0),
-                          Expanded(
-                            child: Text(
-                              name,
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
           ),
         ],
       ),
-      floatingActionButton: _selectedContacts.isNotEmpty
+      floatingActionButton: _selectedUserIds.isNotEmpty
           ? Container(
               width: 48.0,
               height: 48.0,
               child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => CreateGroupScreen(
-                        selectedContacts: _selectedContacts.toList(),
-                      ),
-                    ),
-                  );
-                },
+                onPressed: _isCreating ? null : _handleCreateChat,
                 backgroundColor: AppColors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                child: Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                  size: 20.0,
-                ),
+                child: _isCreating
+                    ? SizedBox(
+                        width: 20.0,
+                        height: 20.0,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.0,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 20.0,
+                      ),
               ),
             )
           : null,
     );
   }
+
+  Future<void> _handleCreateChat() async {
+    if (_selectedUserIds.isEmpty) return;
+
+    setState(() {
+      _isCreating = true;
+    });
+
+    try {
+      // Проверяем и загружаем текущего пользователя
+      UserEntity? currentUser = _authStore.currentUser;
+      if (currentUser == null) {
+        await _authStore.checkAuthStatus();
+        currentUser = _authStore.currentUser;
+      }
+
+      if (currentUser == null) {
+        throw Exception('Пользователь не авторизован');
+      }
+
+      if (_selectedUserIds.length == 1) {
+        // Создаем личный чат (private room)
+        final otherUserIdStr = _selectedUserIds.first;
+        final otherUserId = int.tryParse(otherUserIdStr);
+        if (otherUserId == null) {
+          throw Exception('Неверный ID пользователя: $otherUserIdStr');
+        }
+
+        final chat = ChatEntity(
+          id: '0',
+          name: null,
+          owner: currentUser,
+          type: 'private',
+          lastMessage: null,
+          participantUserIds: [currentUser.id, otherUserIdStr],
+          insertedAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          encryptionEnabled: false,
+          inviteToken: null,
+          unreadCount: 0,
+        );
+
+        final createdChat = await _chatStore.createChat(chat);
+
+        // Переходим на экран чата
+        if (mounted) {
+          // Обновляем список чатов
+          final currentUserId = _authStore.currentUserId;
+          if (currentUserId != null) {
+            await _chatStore.loadChats(currentUserId);
+          }
+
+          // Переходим на экран чата
+          context.go('/chat/${createdChat.id}');
+        }
+      } else {
+        // Несколько контактов - показываем экран создания группы
+        final selectedUsers = _allContacts
+            .where((user) => _selectedUserIds.contains(user.id))
+            .toList();
+        if (mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => CreateGroupScreen(
+                selectedUsers: selectedUsers,
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка создания чата: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+        });
+      }
+    }
+  }
 }
 
 class CreateGroupScreen extends StatefulWidget {
-  final List<String> selectedContacts;
+  final List<UserEntity> selectedUsers;
 
-  const CreateGroupScreen({Key? key, required this.selectedContacts})
-    : super(key: key);
+  const CreateGroupScreen({Key? key, required this.selectedUsers})
+      : super(key: key);
 
   @override
   _CreateGroupScreenState createState() => _CreateGroupScreenState();
@@ -247,20 +428,30 @@ class CreateGroupScreen extends StatefulWidget {
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final TextEditingController _groupNameController = TextEditingController();
+  final ChatStore _chatStore = locator<ChatStore>();
+  final AuthStore _authStore = locator<AuthStore>();
+  bool _isCreating = false;
 
-  final Map<String, Color> _contactColors = {
-    'Артём': Colors.purple,
-    'Елена': Colors.pink,
-    'Александр': Colors.green,
-    'Дмитрий': Colors.orange,
-    'Иван': Colors.blue,
-    'София': Colors.purple,
-  };
+  Color _getAvatarColor(String userId) {
+    // Генерируем цвет на основе ID пользователя
+    final hash = userId.hashCode;
+    final colors = [
+      Colors.purple,
+      Colors.pink,
+      Colors.green,
+      Colors.orange,
+      Colors.blue,
+      Colors.teal,
+      Colors.indigo,
+      Colors.red,
+    ];
+    return colors[hash.abs() % colors.length];
+  }
 
   @override
   void initState() {
     super.initState();
-    _groupNameController.text = widget.selectedContacts.join(', ');
+    // Не заполняем поле по умолчанию - пользователь должен ввести название сам
   }
 
   @override
@@ -321,6 +512,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       controller: _groupNameController,
                       style: TextStyle(fontSize: 16.0, color: Colors.black87),
                       decoration: InputDecoration(
+                        hintText: 'Введите название группы',
+                        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16.0),
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
@@ -334,7 +527,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                '${widget.selectedContacts.length} участника',
+                '${widget.selectedUsers.length} участника',
                 style: TextStyle(
                   fontSize: 14.0,
                   color: Colors.grey[600],
@@ -346,8 +539,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
-                children: widget.selectedContacts.map((name) {
-                  final avatarColor = _contactColors[name] ?? Colors.purple;
+                children: widget.selectedUsers.map((user) {
+                  final displayName = user.name.isNotEmpty ? user.name : user.phone;
+                  final avatarColor = _getAvatarColor(user.id);
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8.0),
                     padding: const EdgeInsets.symmetric(
@@ -368,8 +562,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: Center(
-                            child: SvgPicture.asset(
-                              'assets/profile/user.svg',
+                            child: Assets.profile.user.svg(
                               width: 20.0,
                               height: 20.0,
                               colorFilter: ColorFilter.mode(
@@ -382,7 +575,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: Text(
-                            name,
+                            displayName,
                             style: TextStyle(
                               fontSize: 16.0,
                               color: Colors.black87,
@@ -403,14 +596,97 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         width: 48.0,
         height: 48.0,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: _isCreating ? null : _createGroup,
           backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
-          child: Icon(Icons.arrow_forward, color: Colors.white, size: 20.0),
+          child: _isCreating
+              ? SizedBox(
+                  width: 20.0,
+                  height: 20.0,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Icon(Icons.arrow_forward, color: Colors.white, size: 20.0),
         ),
       ),
     );
+  }
+
+  Future<void> _createGroup() async {
+    if (_groupNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Введите название группы')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isCreating = true;
+    });
+
+    try {
+      // Проверяем и загружаем текущего пользователя, если его нет
+      UserEntity? currentUser = _authStore.currentUser;
+      if (currentUser == null) {
+        await _authStore.checkAuthStatus();
+        currentUser = _authStore.currentUser;
+      }
+      
+      if (currentUser == null) {
+        throw Exception('Пользователь не авторизован');
+      }
+
+      // Получаем user IDs из выбранных пользователей
+      final participantUserIds = [
+        currentUser.id,
+        ...widget.selectedUsers.map((user) => user.id),
+      ];
+
+      // Создаем ChatEntity для группы
+      // id будет установлен сервером после создания
+      final chat = ChatEntity(
+        id: '0', // временное значение, будет заменено сервером
+        name: _groupNameController.text.trim(),
+        owner: currentUser,
+        type: 'group',
+        lastMessage: null,
+        participantUserIds: participantUserIds,
+        insertedAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        encryptionEnabled: false,
+        inviteToken: null,
+        unreadCount: 0,
+      );
+
+      final createdChat = await _chatStore.createChat(chat);
+
+      // Переходим на экран чата
+      if (mounted) {
+        // Обновляем список чатов
+        final currentUserId = _authStore.currentUserId;
+        if (currentUserId != null) {
+          await _chatStore.loadChats(currentUserId);
+        }
+        
+        // Переходим на экран чата
+        context.go('/chat/${createdChat.id}');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка создания группы: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+        });
+      }
+    }
   }
 }

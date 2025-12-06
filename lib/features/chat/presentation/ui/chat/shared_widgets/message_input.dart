@@ -8,12 +8,14 @@ class MessageInput extends StatefulWidget {
   final MessageEntity? replyToMessage;
   final UserEntity? replyToUser;
   final VoidCallback? onReplyCancel;
+  final Function(String text, MessageEntity? replyTo)? onSend;
 
   const MessageInput({
     Key? key,
     this.replyToMessage,
     this.replyToUser,
     this.onReplyCancel,
+    this.onSend,
   }) : super(key: key);
 
   @override
@@ -237,7 +239,18 @@ class _MessageInputState extends State<MessageInput>
                       Builder(builder: (_) {
                         if (_showSendMessageButton)
                           return _SendMessageEntityButton(
-                              controller: _controller);
+                            controller: _controller,
+                            onSend: () {
+                              final text = _textController.text.trim();
+                              if (text.isNotEmpty && widget.onSend != null) {
+                                widget.onSend!(text, widget.replyToMessage);
+                                _textController.clear();
+                                setState(() {
+                                  _showSendMessageButton = false;
+                                });
+                              }
+                            },
+                          );
 
                         return Container(
                           margin: const EdgeInsets.only(right: 8.0),
@@ -269,10 +282,12 @@ class _MessageInputState extends State<MessageInput>
 
 class _SendMessageEntityButton extends AnimatedWidget {
   final AnimationController controller;
+  final VoidCallback? onSend;
 
   _SendMessageEntityButton({
     Key? key,
     required this.controller,
+    this.onSend,
   })  : _scale = Tween<double>(
           begin: 0.0,
           end: 1.0,
@@ -301,7 +316,7 @@ class _SendMessageEntityButton extends AnimatedWidget {
 
   Widget _buildSendMessageEntityButton(BuildContext context) {
     return IconButton(
-      onPressed: () {},
+      onPressed: onSend,
       icon: Icon(
         AppIcons.send,
         size: 21.0,

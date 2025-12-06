@@ -15,6 +15,7 @@ class MessageBubble extends StatelessWidget {
   final UserEntity? messageUser;
   final bool isSelected;
   final bool showAvatar;
+  final bool isOwnMessage;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onSwipeReply;
@@ -27,6 +28,7 @@ class MessageBubble extends StatelessWidget {
     this.messageUser,
     this.isSelected = false,
     this.showAvatar = false,
+    required this.isOwnMessage,
     this.onTap,
     this.onLongPress,
     this.onSwipeReply,
@@ -35,8 +37,6 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authStore = locator<AuthStore>();
-    final isOwnMessage = message.owner == (authStore.currentUserId ?? '');
     final isSystemMessage = message.type != 'text';
 
     if (isSystemMessage) {

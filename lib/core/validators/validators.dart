@@ -1,6 +1,6 @@
 abstract class Validate {
   static bool phone(String phone) {
-    final regex = RegExp(r'^\d{10,14}$');
+    final regex = RegExp(r'^\d{9,14}$');
     return regex.hasMatch(phone);
   }
 

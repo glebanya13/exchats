@@ -23,6 +23,14 @@ final class ChatUseCase {
     return _chatRepository.createChat(chat);
   }
 
+  Future<void> deleteChat(String chatId) {
+    return _chatRepository.deleteChat(chatId);
+  }
+
+  Future<void> leaveChat(String chatId) {
+    return _chatRepository.leaveChat(chatId);
+  }
+
   Future<List<MessageEntity>> getChatMessages(String chatId) {
     return _chatRepository.getChatMessages(chatId);
   }

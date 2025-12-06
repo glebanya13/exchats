@@ -1,397 +1,162 @@
 import 'dart:async';
+import 'package:collection/collection.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../domain/repository/chat_repository.dart';
 import '../../domain/entity/chat_entity.dart';
 import '../../domain/entity/message_entity.dart';
-import '../../../../core/api/api_service.dart';
+import '../datasource/rooms_api_service.dart';
 import '../mapper/chat_mapper.dart';
 import '../mapper/message_mapper.dart';
 
 @LazySingleton(as: ChatRepository)
 final class ChatRepositoryImpl implements ChatRepository {
-  final ApiService _apiService;
+  final RoomsApiService _roomsApiService;
   final Map<String, StreamController<List<MessageEntity>>> _messageStreams = {};
 
-  ChatRepositoryImpl(this._apiService);
+  ChatRepositoryImpl(this._roomsApiService);
 
   @override
   Future<List<ChatEntity>> getUserChats(String userId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    return [
-      ChatEntity(
-        id: 'chat1',
-        type: 'dialog',
-        messageCounter: 5,
-        historyCleared: false,
-        users: [userId, 'user2'],
-      ),
-      ChatEntity(
-        id: 'chat2',
-        type: 'group',
-        messageCounter: 12,
-        historyCleared: false,
-        users: [userId, 'user2', 'user3', 'user4'],
-      ),
-    ];
+    final response = await _roomsApiService.getRooms();
+    return response.data.map((room) => ChatMapper.toEntity(room)).toList();
   }
 
   @override
   Future<ChatEntity?> getChatById(String id) async {
-    await Future.delayed(const Duration(milliseconds: 200));
+    final roomId = int.tryParse(id);
+    if (roomId == null) return null;
 
-    if (id == 'chat1') {
-      return ChatEntity(
-        id: 'chat1',
-        type: 'dialog',
-        messageCounter: 5,
-        historyCleared: false,
-        users: ['user1', 'user2'],
-      );
-    } else if (id == 'chat2') {
-      return ChatEntity(
-        id: 'chat2',
-        type: 'group',
-        messageCounter: 12,
-        historyCleared: false,
-        users: ['user1', 'user2', 'user3', 'user4'],
-      );
+    try {
+      final room = await _roomsApiService.getRoomById(roomId);
+      return ChatMapper.toEntity(room);
+    } catch (e) {
+      return null;
     }
+  }
 
-    return null;
+  @override
+  Future<void> deleteChat(String chatId) async {
+    final roomId = int.tryParse(chatId);
+    if (roomId == null) {
+      throw ArgumentError('Invalid chatId: $chatId');
+    }
+    await _roomsApiService.deleteRoom(roomId);
+  }
+
+  @override
+  Future<void> leaveChat(String chatId) async {
+    final roomId = int.tryParse(chatId);
+    if (roomId == null) {
+      throw ArgumentError('Invalid chatId: $chatId');
+    }
+    await _roomsApiService.leaveRoom(roomId);
   }
 
   @override
   Future<ChatEntity> createChat(ChatEntity chat) async {
-    final chatDto = ChatMapper.toDto(chat);
-    final createdDto = await _apiService.createChat(chatDto);
-    return ChatMapper.toEntity(createdDto);
+    if (chat.type == 'private') {
+      final otherUserId = chat.participantUserIds
+          .where((uid) => uid != chat.owner.id)
+          .firstOrNull;
+      
+      if (otherUserId == null) {
+        throw ArgumentError('Для private room нужен otherUserId');
+      }
+
+      final otherUserIdInt = int.tryParse(otherUserId);
+      if (otherUserIdInt == null) {
+        throw ArgumentError('Неверный формат otherUserId: $otherUserId');
+      }
+
+      final room = await _roomsApiService.createRoom(
+        type: 'private',
+        otherUserId: otherUserIdInt,
+      );
+
+      return ChatMapper.toEntity(room);
+    } else {
+      final participantIds = chat.participantUserIds
+          .map((uid) => int.tryParse(uid))
+          .whereType<int>()
+          .toList();
+
+      final room = await _roomsApiService.createRoom(
+        type: 'group',
+        name: chat.name,
+        participantIds: participantIds.isNotEmpty ? participantIds : null,
+      );
+
+      return ChatMapper.toEntity(room);
+    }
   }
 
   @override
   Future<List<MessageEntity>> getChatMessages(String chatId) async {
-    await Future.delayed(const Duration(milliseconds: 200));
+    final roomId = int.tryParse(chatId);
+    if (roomId == null) return [];
 
-    final now = DateTime.now();
-
-    if (chatId == 'chat1') {
-      return [
-        MessageEntity(
-          id: 'msg1',
-          owner: 'user2',
-          text: 'Привет! Как дела?',
-          createdAt: now.subtract(const Duration(days: 2, hours: 3)),
-          updatedAt: now.subtract(const Duration(days: 2, hours: 3)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg2',
-          owner: 'user1',
-          text: 'Привет! Всё отлично, спасибо! А у тебя как?',
-          createdAt:
-              now.subtract(const Duration(days: 2, hours: 2, minutes: 50)),
-          updatedAt:
-              now.subtract(const Duration(days: 2, hours: 2, minutes: 50)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg3',
-          owner: 'user2',
-          text: 'Тоже всё хорошо! Спасибо, что спросил 😊',
-          createdAt:
-              now.subtract(const Duration(days: 2, hours: 2, minutes: 40)),
-          updatedAt:
-              now.subtract(const Duration(days: 2, hours: 2, minutes: 40)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg4',
-          owner: 'user1',
-          text: 'Отлично! Кстати, ты не забыл про встречу завтра?',
-          createdAt: now.subtract(const Duration(days: 1, hours: 5)),
-          updatedAt: now.subtract(const Duration(days: 1, hours: 5)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg5',
-          owner: 'user2',
-          text: 'Конечно помню! В 10:00, правильно?',
-          createdAt:
-              now.subtract(const Duration(days: 1, hours: 4, minutes: 50)),
-          updatedAt:
-              now.subtract(const Duration(days: 1, hours: 4, minutes: 50)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg6',
-          owner: 'user1',
-          text: 'Да, именно так! Увидимся там',
-          createdAt:
-              now.subtract(const Duration(days: 1, hours: 4, minutes: 45)),
-          updatedAt:
-              now.subtract(const Duration(days: 1, hours: 4, minutes: 45)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg7',
-          owner: 'user2',
-          text: 'Отлично! До встречи! 👋',
-          createdAt:
-              now.subtract(const Duration(days: 1, hours: 4, minutes: 40)),
-          updatedAt:
-              now.subtract(const Duration(days: 1, hours: 4, minutes: 40)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg8',
-          owner: 'user1',
-          text: 'Кстати, ты видел новую версию приложения?',
-          createdAt: now.subtract(const Duration(hours: 3)),
-          updatedAt: now.subtract(const Duration(hours: 3)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg9',
-          owner: 'user2',
-          text: 'Да, видел! Очень круто получилось!',
-          createdAt: now.subtract(const Duration(hours: 2, minutes: 50)),
-          updatedAt: now.subtract(const Duration(hours: 2, minutes: 50)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg10',
-          owner: 'user1',
-          text: 'Согласен! Особенно понравился новый дизайн',
-          createdAt: now.subtract(const Duration(hours: 2, minutes: 40)),
-          updatedAt: now.subtract(const Duration(hours: 2, minutes: 40)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg11',
-          owner: 'user2',
-          text: 'Ага, и интерфейс стал намного удобнее',
-          createdAt: now.subtract(const Duration(hours: 2, minutes: 30)),
-          updatedAt: now.subtract(const Duration(hours: 2, minutes: 30)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg12',
-          owner: 'user1',
-          text: 'Точно! Кстати, можешь прислать файл, который мы обсуждали?',
-          createdAt: now.subtract(const Duration(hours: 1)),
-          updatedAt: now.subtract(const Duration(hours: 1)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg13',
-          owner: 'user2',
-          text: 'Конечно! Сейчас отправлю',
-          createdAt: now.subtract(const Duration(minutes: 50)),
-          updatedAt: now.subtract(const Duration(minutes: 50)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg14',
-          owner: 'user2',
-          text: 'Отправил! Проверь, пожалуйста',
-          createdAt: now.subtract(const Duration(minutes: 45)),
-          updatedAt: now.subtract(const Duration(minutes: 45)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'msg15',
-          owner: 'user1',
-          text: 'Спасибо! Получил, всё отлично 👍',
-          createdAt: now.subtract(const Duration(minutes: 30)),
-          updatedAt: now.subtract(const Duration(minutes: 30)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-      ];
-    } else if (chatId == 'chat2') {
-      return [
-        MessageEntity(
-          id: 'group_msg1',
-          owner: 'user3',
-          text: 'Всем привет в группе!',
-          createdAt: now.subtract(const Duration(hours: 2)),
-          updatedAt: now.subtract(const Duration(hours: 2)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg2',
-          owner: 'user1',
-          text: 'Привет, ребята!',
-          createdAt: now.subtract(const Duration(hours: 1, minutes: 50)),
-          updatedAt: now.subtract(const Duration(hours: 1, minutes: 50)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg3',
-          owner: 'user4',
-          text: 'Привет всем! Как дела?',
-          createdAt: now.subtract(const Duration(hours: 1, minutes: 40)),
-          updatedAt: now.subtract(const Duration(hours: 1, minutes: 40)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg4',
-          owner: 'user2',
-          text: 'Всё отлично! Спасибо',
-          createdAt: now.subtract(const Duration(hours: 1, minutes: 30)),
-          updatedAt: now.subtract(const Duration(hours: 1, minutes: 30)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg5',
-          owner: 'user1',
-          text: 'Отлично! Кто готов к встрече?',
-          createdAt: now.subtract(const Duration(hours: 1, minutes: 20)),
-          updatedAt: now.subtract(const Duration(hours: 1, minutes: 20)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg6',
-          owner: 'user3',
-          text: 'Я готов!',
-          createdAt: now.subtract(const Duration(hours: 1, minutes: 10)),
-          updatedAt: now.subtract(const Duration(hours: 1, minutes: 10)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg7',
-          owner: 'user4',
-          text: 'И я тоже!',
-          createdAt: now.subtract(const Duration(hours: 1)),
-          updatedAt: now.subtract(const Duration(hours: 1)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg8',
-          owner: 'user2',
-          text: 'Отлично! Тогда встречаемся завтра в 10:00',
-          createdAt: now.subtract(const Duration(minutes: 50)),
-          updatedAt: now.subtract(const Duration(minutes: 50)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg9',
-          owner: 'user1',
-          text: 'Договорились!',
-          createdAt: now.subtract(const Duration(minutes: 40)),
-          updatedAt: now.subtract(const Duration(minutes: 40)),
-          edited: false,
-          read: true,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg10',
-          owner: 'user3',
-          text: 'Супер!',
-          createdAt: now.subtract(const Duration(minutes: 30)),
-          updatedAt: now.subtract(const Duration(minutes: 30)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg11',
-          owner: 'user4',
-          text: 'Жду встречи!',
-          createdAt: now.subtract(const Duration(minutes: 20)),
-          updatedAt: now.subtract(const Duration(minutes: 20)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-        MessageEntity(
-          id: 'group_msg12',
-          owner: 'user2',
-          text: 'До встречи, ребята! 👋',
-          createdAt: now.subtract(const Duration(minutes: 10)),
-          updatedAt: now.subtract(const Duration(minutes: 10)),
-          edited: false,
-          read: false,
-          type: 'text',
-        ),
-      ];
-    }
-
-    return [];
+    final response = await _roomsApiService.getRoomMessages(roomId: roomId);
+    return response.data.map((msg) => MessageMapper.toEntity(msg)).toList();
   }
 
   @override
   Future<MessageEntity> sendMessage(
       String chatId, MessageEntity message) async {
-    final messageDto = MessageMapper.toDto(message);
-    final sentDto = await _apiService.sendMessage(chatId, messageDto);
-    return MessageMapper.toEntity(sentDto);
+    final roomId = int.tryParse(chatId);
+    if (roomId == null) {
+      throw ArgumentError('Invalid chatId: $chatId');
+    }
+
+    final sentMessage = await _roomsApiService.createMessage(
+      roomId: roomId,
+      content: message.content,
+      type: message.type,
+      fileName: message.fileName,
+      metadata: message.metadata,
+      replyToId: message.replyTo != null
+          ? int.tryParse(message.replyTo!['id']?.toString() ?? '')
+          : null,
+    );
+
+    return MessageMapper.toEntity(sentMessage);
   }
 
   @override
   Future<MessageEntity> updateMessage(
       String chatId, String messageId, MessageEntity message) async {
-    final messageDto = MessageMapper.toDto(message);
-    final updatedDto =
-        await _apiService.updateMessage(chatId, messageId, messageDto);
-    return MessageMapper.toEntity(updatedDto);
+    final msgId = int.tryParse(messageId);
+    if (msgId == null) {
+      throw ArgumentError('Invalid messageId: $messageId');
+    }
+
+    final updatedMessage = await _roomsApiService.updateMessage(
+      id: msgId,
+      content: message.content,
+    );
+
+    return MessageMapper.toEntity(updatedMessage);
   }
 
   @override
   Future<void> deleteMessage(String chatId, String messageId) async {
-    await _apiService.deleteMessage(chatId, messageId);
+    final msgId = int.tryParse(messageId);
+    if (msgId == null) {
+      throw ArgumentError('Invalid messageId: $messageId');
+    }
+
+    await _roomsApiService.deleteMessage(msgId);
   }
 
   @override
   Future<void> markMessagesAsRead(
       String chatId, List<String> messageIds) async {
-    await _apiService.markMessagesAsRead(chatId, messageIds);
+    final roomId = int.tryParse(chatId);
+    if (roomId == null) {
+      throw ArgumentError('Invalid chatId: $chatId');
+    }
+
+    await _roomsApiService.markMessagesAsRead(roomId);
   }
 
   @override
@@ -400,18 +165,24 @@ final class ChatRepositoryImpl implements ChatRepository {
       final controller = StreamController<List<MessageEntity>>.broadcast();
       _messageStreams[chatId] = controller;
 
-      Timer.periodic(const Duration(seconds: 2), (timer) async {
+      getChatMessages(chatId).then((messages) {
+        if (!controller.isClosed) {
+          controller.add(messages);
+        }
+      });
+
+      Timer.periodic(const Duration(seconds: 5), (timer) async {
         if (controller.isClosed) {
           timer.cancel();
           return;
         }
-        final messages = await getChatMessages(chatId);
-        controller.add(messages);
-      });
-
-      getChatMessages(chatId).then((messages) {
-        if (!controller.isClosed) {
-          controller.add(messages);
+        try {
+          final messages = await getChatMessages(chatId);
+          if (!controller.isClosed) {
+            controller.add(messages);
+          }
+        } catch (e) {
+          // ignore
         }
       });
     }

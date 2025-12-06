@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import '../../domain/usecase/chat_usecase.dart';
@@ -37,48 +36,21 @@ abstract class _ChatStore with Store {
     error = null;
     chatsLoaded = false;
     try {
-      if (kDebugMode) {
-        debugPrint('ChatStore: Loading chats for userId: $userId');
-      }
       final loadedChats = await _chatUseCase.getUserChats(userId);
-      if (kDebugMode) {
-        debugPrint('ChatStore: Loaded ${loadedChats.length} chats');
-      }
       chats.clear();
       chats.addAll(loadedChats);
-      if (kDebugMode) {
-        debugPrint('ChatStore: Added ${chats.length} chats to observable list');
-      }
-      chatsLoaded = true;
-
+      
+      lastMessages.clear();
       for (final chat in loadedChats) {
-        _loadLastMessage(chat.id);
+        lastMessages[chat.id] = chat.lastMessage;
       }
-    } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('ChatStore: Error loading chats: $e');
-        debugPrint('Stack trace: $stackTrace');
-      }
+      
+      chatsLoaded = true;
+    } catch (e) {
       error = e.toString();
       chatsLoaded = false;
     } finally {
       isLoading = false;
-    }
-  }
-
-  @action
-  Future<void> _loadLastMessage(String chatId) async {
-    try {
-      final messages = await _chatUseCase.getChatMessages(chatId);
-      if (messages.isNotEmpty) {
-        final sortedMessages = List<MessageEntity>.from(messages)
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        lastMessages[chatId] = sortedMessages.first;
-      } else {
-        lastMessages[chatId] = null;
-      }
-    } catch (e) {
-      lastMessages[chatId] = null;
     }
   }
 
@@ -99,6 +71,34 @@ abstract class _ChatStore with Store {
       final createdChat = await _chatUseCase.createChat(chat);
       chats.add(createdChat);
       return createdChat;
+    } catch (e) {
+      error = e.toString();
+      rethrow;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
+  Future<void> deleteChat(String chatId) async {
+    isLoading = true;
+    try {
+      await _chatUseCase.deleteChat(chatId);
+      chats.removeWhere((chat) => chat.id == chatId);
+    } catch (e) {
+      error = e.toString();
+      rethrow;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
+  Future<void> leaveChat(String chatId) async {
+    isLoading = true;
+    try {
+      await _chatUseCase.leaveChat(chatId);
+      chats.removeWhere((chat) => chat.id == chatId);
     } catch (e) {
       error = e.toString();
       rethrow;

@@ -160,7 +160,8 @@ class MockApiService implements ApiService {
       String chatId, String messageId, MessageDto message) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final messages = MockData.messages[chatId] ?? [];
-    final index = messages.indexWhere((m) => m.id == messageId);
+    final msgId = int.tryParse(messageId);
+    final index = msgId != null ? messages.indexWhere((m) => m.id == msgId) : -1;
     if (index != -1) {
       messages[index] = message;
       MockData.messages[chatId] = messages;
@@ -172,7 +173,10 @@ class MockApiService implements ApiService {
   Future<void> deleteMessage(String chatId, String messageId) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final messages = MockData.messages[chatId] ?? [];
-    messages.removeWhere((m) => m.id == messageId);
+    final msgId = int.tryParse(messageId);
+    if (msgId != null) {
+      messages.removeWhere((m) => m.id == msgId);
+    }
     MockData.messages[chatId] = messages;
   }
 
@@ -181,21 +185,24 @@ class MockApiService implements ApiService {
       String chatId, List<String> messageIds) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final messages = MockData.messages[chatId] ?? [];
+    final msgIds = messageIds.map((id) => int.tryParse(id)).whereType<int>().toList();
     for (final message in messages) {
-      if (messageIds.contains(message.id)) {
+      if (msgIds.contains(message.id)) {
         final index = messages.indexOf(message);
+        // Mark as read by keeping the message as is (this is mock, so we just update the message)
         messages[index] = MessageDto(
           id: message.id,
-          owner: message.owner,
-          text: message.text,
-          createdAt: message.createdAt,
-          updatedAt: message.updatedAt,
-          edited: message.edited,
-          read: true,
           type: message.type,
+          fileName: message.fileName,
+          metadata: message.metadata,
+          userId: message.userId,
+          insertedAt: message.insertedAt,
+          content: message.content,
+          editedAt: message.editedAt,
+          encrypted: message.encrypted,
+          fileUrl: message.fileUrl,
+          guestName: message.guestName,
           replyTo: message.replyTo,
-          participants: message.participants,
-          callDuration: message.callDuration,
         );
       }
     }

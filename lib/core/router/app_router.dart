@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:exchats/core/services/secure_storage/token_repository.dart';
 import 'package:exchats/features/splash/presentation/ui/splash_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,10 @@ import '../../features/call/presentation/ui/call/active_call_screen.dart';
 import '../../features/call/presentation/ui/calls/new_call_screen.dart';
 
 class AppRouter {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   static final GoRouter router = GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: '/splash',
     routes: [
       GoRoute(
